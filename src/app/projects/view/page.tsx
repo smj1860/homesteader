@@ -24,6 +24,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { compressImage } from "@/lib/image-utils"
+import { ToolMatchWidget } from "@/components/affiliate/tool-match-widget"
 
 type ProjectWithMeta = ProjectInstructionGeneratorOutput & {
   id?: string
@@ -290,6 +291,14 @@ export default function ProjectViewPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* ── Affiliate Shop Widget ───────────────────────────────────────
+                  Matches each tool in the list against your affiliate_products
+                  database and shows Budget / Best Value / Pro Choice options.
+                  Renders nothing if no matches are found, so it's always safe.
+              ─────────────────────────────────────────────────────────────── */}
+              <ToolMatchWidget toolTerms={project.toolsAndItemsNeeded ?? []} />
+
             </section>
 
             <section className="space-y-6 pb-12">

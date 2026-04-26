@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Star, ExternalLink, ThumbsUp, Filter, ShoppingCart, Plus, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { ReviewBuyButton } from "@/components/affiliate/review-buy-button"
 
 export default function ToolReviewsPage() {
   const [search, setSearch] = useState("")
@@ -63,7 +64,7 @@ export default function ToolReviewsPage() {
         ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((tool) => (
-              <Card key={tool.id} className="overflow-hidden group hover:shadow-lg transition-all border-border/40 bg-card text-card-foreground">
+              <Card key={tool.id} className="overflow-hidden group hover:shadow-lg transition-all border-border/40 bg-card text-card-foreground flex flex-col">
                 <div className="relative h-48 w-full bg-black/10">
                   <Image 
                     src={tool.image_url || "https://picsum.photos/seed/tool/400/300"} 
@@ -84,7 +85,7 @@ export default function ToolReviewsPage() {
                   <CardTitle className="font-headline text-card-foreground">{tool.name}</CardTitle>
                   <CardDescription className="text-card-foreground/70">By {tool.brand}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-xl font-bold text-card-foreground">{tool.price}</span>
                     <span className="text-xs opacity-70">{tool.reviews_count || 0} Verified Reviews</span>
@@ -99,8 +100,22 @@ export default function ToolReviewsPage() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* ── Tiered Affiliate Options ────────────────────────────────
+                      Looks up this tool's brand + name in your affiliate_products
+                      table and shows Budget / Best Value / Pro Choice buttons if
+                      matches exist. Returns null silently when there's no match.
+                  ─────────────────────────────────────────────────────────── */}
+                  <ReviewBuyButton
+                    brand={tool.brand}
+                    model={tool.name}
+                    reviewTitle={tool.name}
+                  />
+
                 </CardContent>
                 <CardFooter className="gap-2">
+                  {/* This button uses the affiliate_url stored directly on the
+                      review record — the exact item you reviewed. */}
                   <Button className="flex-1 bg-accent text-accent-foreground font-bold hover:bg-accent/90" asChild>
                     <a href={tool.affiliate_url || `https://www.amazon.com/s?k=${encodeURIComponent(tool.name)}`} target="_blank" rel="noopener noreferrer">
                       <ShoppingCart className="mr-2 h-4 w-4" /> Check Price
