@@ -1,4 +1,3 @@
-```typescript
 'use client';
 
 import { useUser, useSupabaseClient } from '@/supabase';
@@ -90,6 +89,3 @@ export function useSustainData() {
     upgradeToPaid,
   };
 }
-```
-
----
