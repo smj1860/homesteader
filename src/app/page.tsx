@@ -118,12 +118,12 @@ export default function Home() {
                 <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full px-8" asChild>
                   <Link href="/projects">Start a Project</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 rounded-full px-8" asChild>
-                  <Link href="/workshop">View Workshops</Link>
+                <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full px-8" asChild>
+                  <Link href="/signup">Sign Up</Link>
                 </Button>
               </div>
             </div>
-          </div>
+        </div>
         </section>
 
         {/* How it Works Section */}
