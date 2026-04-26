@@ -1,4 +1,3 @@
-```tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -76,4 +75,3 @@ export function useDoc<T = any>(
 
   return { data, isLoading, error };
 }
-```

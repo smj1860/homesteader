@@ -1,4 +1,3 @@
-```typescript
 import { SupabaseClient } from '@supabase/supabase-js';
 
 /** Anonymous sign-in (non-blocking). Auth state change is handled by onAuthStateChange. */
@@ -28,4 +27,3 @@ export function initiateEmailSignIn(
 export function initiateSignOut(supabase: SupabaseClient): void {
   supabase.auth.signOut();
 }
-```

@@ -1,4 +1,3 @@
-```tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -91,4 +90,3 @@ export function useCollection<T = any>(
 
   return { data, isLoading, error };
 }
-```

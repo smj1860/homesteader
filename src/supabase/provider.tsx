@@ -1,4 +1,3 @@
-```tsx
 'use client';
 
 import React, {
@@ -78,4 +77,3 @@ export function useUser() {
 export function useSupabaseClient() {
   return useSupabase().supabase;
 }
-```

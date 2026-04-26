@@ -1,4 +1,3 @@
-```typescript
 import { createClient } from './config';
 
 const supabase = createClient();
@@ -48,4 +47,3 @@ export function deleteNonBlocking(table: string, id: string) {
       if (error) console.error(`[delete:${table}:${id}]`, error.message);
     });
 }
-```
