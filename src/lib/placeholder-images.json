@@ -1,0 +1,34 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-homestead",
+      "description": "A beautiful lush vegetable garden with a small cottage in the background",
+      "imageUrl": "https://picsum.photos/seed/homestead1/1200/600",
+      "imageHint": "homestead garden"
+    },
+    {
+      "id": "plumbing",
+      "description": "Professional plumbing tools and pipes",
+      "imageUrl": "https://picsum.photos/seed/plumbing/400/300",
+      "imageHint": "plumbing repair"
+    },
+    {
+      "id": "electrical",
+      "description": "Electrical wiring and circuit breaker",
+      "imageUrl": "https://picsum.photos/seed/elec/400/300",
+      "imageHint": "electrical wiring"
+    },
+    {
+      "id": "gardening",
+      "description": "Close up of hands planting a sapling",
+      "imageUrl": "https://picsum.photos/seed/garden/400/300",
+      "imageHint": "gardening planting"
+    },
+    {
+      "id": "canning",
+      "description": "Mason jars filled with colorful preserves",
+      "imageUrl": "https://picsum.photos/seed/canning/400/300",
+      "imageHint": "canning jars"
+    }
+  ]
+}
