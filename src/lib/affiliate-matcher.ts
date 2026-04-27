@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/supabase/config'
 
 export type AffiliateTier = 'budget' | 'mid' | 'premium'
 
@@ -15,9 +15,9 @@ export interface AffiliateProduct {
 }
 
 export interface ToolMatch {
-  originalTerm: string        // what the AI said, e.g. "cordless drill"
-  canonicalName: string       // normalized name, e.g. "cordless drill"
-  products: AffiliateProduct[] // all tiers matched
+  originalTerm: string
+  canonicalName: string
+  products: AffiliateProduct[]
 }
 
 // ─── Cache so we don't hammer Supabase on every render ───────────────────────
@@ -34,7 +34,7 @@ async function getAllProducts(): Promise<AffiliateProduct[]> {
     .from('affiliate_products')
     .select('*')
     .eq('is_active', true)
-  
+
   if (error || !data) return []
   cachedProducts = data
   cacheTime = Date.now()
@@ -45,45 +45,40 @@ async function getAllProducts(): Promise<AffiliateProduct[]> {
 function normalize(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '') // strip punctuation
+    .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
 }
 
 // ─── Score how well a term matches a product's keywords ──────────────────────
-function matchScore(term: string, product: AffiliateProduct): number {
+function matchScore(term: string, product: AffiliateProduct & { keywords?: string[] }): number {
   const normalizedTerm = normalize(term)
   const termWords = normalizedTerm.split(' ')
-  
+
   let score = 0
-  
-  // Check canonical name (highest weight)
+
   const canonicalWords = normalize(product.canonical_name).split(' ')
   const canonicalMatches = termWords.filter(w => canonicalWords.includes(w)).length
   score += canonicalMatches * 3
-  
-  // Check keywords array
-  for (const keyword of product.keywords) {
+
+  for (const keyword of (product.keywords ?? [])) {
     const kw = normalize(keyword)
     if (normalizedTerm.includes(kw) || kw.includes(normalizedTerm)) {
       score += 2
     }
-    // Partial word matches
     const kwWords = kw.split(' ')
     const partialMatches = termWords.filter(w => kwWords.includes(w)).length
     score += partialMatches * 1
   }
-  
-  // Brand name match bonus
+
   if (normalizedTerm.includes(normalize(product.brand))) {
     score += 4
   }
-  
-  // Model match bonus
+
   if (product.model && normalizedTerm.includes(normalize(product.model))) {
     score += 5
   }
-  
+
   return score
 }
 
@@ -93,34 +88,31 @@ export async function matchToolsToAffiliates(
 ): Promise<ToolMatch[]> {
   const products = await getAllProducts()
   const results: ToolMatch[] = []
-  
+
   for (const term of toolTerms) {
-    // Score every product against this term
     const scored = products
       .map(p => ({ product: p, score: matchScore(term, p) }))
-      .filter(({ score }) => score >= 2) // minimum threshold
+      .filter(({ score }) => score >= 2)
       .sort((a, b) => b.score - a.score)
-    
+
     if (scored.length === 0) continue
-    
-    // Group by canonical_name, take the best-scoring canonical
+
     const topCanonical = scored[0].product.canonical_name
     const matchedProducts = scored
       .filter(({ product }) => product.canonical_name === topCanonical)
       .map(({ product }) => product)
-      // Sort by tier: budget → mid → premium
       .sort((a, b) => {
         const order = { budget: 0, mid: 1, premium: 2 }
         return order[a.tier] - order[b.tier]
       })
-    
+
     results.push({
       originalTerm: term,
       canonicalName: topCanonical,
       products: matchedProducts,
     })
   }
-  
+
   return results
 }
 
@@ -132,7 +124,7 @@ export async function findProductForReview(
   const products = await getAllProducts()
   const normalizedBrand = normalize(brand)
   const normalizedModel = model ? normalize(model) : null
-  
+
   return products.filter(p => {
     const brandMatch = normalize(p.brand) === normalizedBrand
     if (!brandMatch) return false
