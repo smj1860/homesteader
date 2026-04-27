@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { findProductForReview, AffiliateProduct, AffiliateTier } from '@/lib/affiliate-matcher'
 import { ExternalLink, Tag } from 'lucide-react'
@@ -17,18 +18,18 @@ interface Props {
 
 export function ReviewBuyButton({ brand, model, reviewTitle }: Props) {
   const [products, setProducts] = useState<AffiliateProduct[]>([])
-  
+
   useEffect(() => {
     findProductForReview(brand, model).then(setProducts)
   }, [brand, model])
 
   if (products.length === 0) return null
 
-  // If there's an exact match (same brand+model), show a single prominent CTA
+  // Single exact match — prominent CTA button
   if (products.length === 1) {
     const p = products[0]
     return (
-      
+      <a
         href={p.affiliate_url}
         target="_blank"
         rel="noopener noreferrer sponsored"
@@ -51,7 +52,7 @@ export function ReviewBuyButton({ brand, model, reviewTitle }: Props) {
         {products.map((p) => {
           const cfg = TIER_CONFIG[p.tier as AffiliateTier]
           return (
-            
+            <a
               key={p.id}
               href={p.affiliate_url}
               target="_blank"
@@ -59,7 +60,9 @@ export function ReviewBuyButton({ brand, model, reviewTitle }: Props) {
               className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold ${cfg.bg} ${cfg.text} hover:opacity-90 transition-opacity`}
             >
               {p.brand} {p.model ?? ''}
-              {p.price_display && <span className="opacity-80 text-xs">· {p.price_display}</span>}
+              {p.price_display && (
+                <span className="opacity-80 text-xs">· {p.price_display}</span>
+              )}
               <ExternalLink className="h-3 w-3 opacity-70" />
             </a>
           )

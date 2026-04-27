@@ -1,17 +1,18 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { matchToolsToAffiliates, ToolMatch } from '@/lib/affiliate-matcher'
 import { ExternalLink, ShoppingCart, ChevronDown, ChevronUp } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 const TIER_LABELS: Record<string, { label: string; color: string }> = {
-  budget:  { label: 'Budget Pick',  color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-  mid:     { label: 'Best Value',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  premium: { label: 'Pro Choice',   color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+  budget:  { label: 'Budget Pick', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+  mid:     { label: 'Best Value',  color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  premium: { label: 'Pro Choice',  color: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
 }
 
 interface Props {
-  toolTerms: string[] // the raw list of tools from the AI guide
+  toolTerms: string[]
 }
 
 export function ToolMatchWidget({ toolTerms }: Props) {
@@ -52,7 +53,7 @@ export function ToolMatchWidget({ toolTerms }: Props) {
               {match.products.map((product) => {
                 const tier = TIER_LABELS[product.tier]
                 return (
-                  
+                  <a
                     key={product.id}
                     href={product.affiliate_url}
                     target="_blank"
