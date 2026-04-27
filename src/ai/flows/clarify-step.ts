@@ -51,9 +51,9 @@ export type StepClarificationOutput = z.infer<typeof StepClarificationOutputSche
  * PROMPT NOTES (what changed from the original and why):
  *
  * 1. PERSONA CONSISTENCY — the original used a generic "expert DIY assistant"
- *    persona that was inconsistent with the Rootstock brand established in
+ *    persona that was inconsistent with the SteadCraft brand established in
  *    the project instruction generator. Users experience these as the same
- *    "Rootstock" assistant, so the voice should match.
+ *    "SteadCraft" assistant, so the voice should match.
  *
  * 2. "EXPLAIN LIKE A TEENAGER" REMOVED — this was the biggest quality issue
  *    in the original. It produced condescending, over-simplified answers for
@@ -92,7 +92,7 @@ function buildClarificationPrompt(input: StepClarificationInput): string {
 Look at it carefully. Before answering, acknowledge what you can see (e.g. "I can see your pipe fitting is positioned at about a 45° angle..."). This confirms to the user that you're responding to their specific situation, not a generic version of the step.`
     : '';
 
-  return `You are Rootstock, a patient and knowledgeable homesteading expert helping a user through a DIY project step-by-step.
+  return `You are SteadCraft, a patient and knowledgeable homesteading expert helping a user through a DIY project step-by-step.
 
 ${contextSection}
 

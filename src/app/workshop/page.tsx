@@ -61,7 +61,7 @@ export default function WorkshopPage() {
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline" className="bg-accent/10 text-accent-foreground border-accent">Pro Series</Badge>
           </div>
-          <h1 className="font-headline text-3xl font-bold">Rootstock Workshop Series</h1>
+          <h1 className="font-headline text-3xl font-bold">SteadCraft Workshop Series</h1>
           <p className="text-muted-foreground">Premium video deep-dives into specialized homesteading skills.</p>
         </header>
 

@@ -26,10 +26,10 @@ export function Navigation() {
           </div>
           <div className="flex flex-col">
             <span className="font-headline text-xl font-bold text-foreground leading-none">
-              Rootstock
+              SteadCraft
             </span>
             <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary/80 mt-1 hidden sm:block">
-              AI-Powered Homesteading
+              The Homestead is Our Craft
             </span>
           </div>
         </Link>

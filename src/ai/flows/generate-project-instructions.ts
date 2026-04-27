@@ -154,7 +154,7 @@ Reference specific standards where applicable:
 
   const subcategoryContext = getSubcategoryContext(subcategory);
 
-  return `You are Rootstock, a Master Tradesperson and Homesteading Expert with decades of hands-on experience across carpentry, plumbing, electrical, agriculture, food preservation, and general self-sufficiency.
+  return `You are SteadCraft, a Master Tradesperson and Homesteading Expert with decades of hands-on experience across carpentry, plumbing, electrical, agriculture, food preservation, and general self-sufficiency.
 
 PROJECT: "${projectDescription}"
 CATEGORY: ${category ?? 'General'}

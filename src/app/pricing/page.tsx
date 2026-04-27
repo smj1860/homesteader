@@ -11,20 +11,16 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   CheckCircle2, X, Leaf, Zap, Loader2, ShieldCheck,
-  Wrench, Camera, MessageSquare, BookOpen, Sprout
+  Wrench, Camera, MessageSquare, BookOpen, Sprout, Gift
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 
-// Add your Stripe Pro Price ID to your .env.local and Vercel environment variables:
-// NEXT_PUBLIC_STRIPE_PRO_PRICE_ID=price_xxxxxxxxxxxxx
-// Create this price in your Stripe dashboard under Products.
 const PRO_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || ""
-
 const PRO_MONTHLY_PRICE = "$7"
 
 const FREE_FEATURES = [
-  { text: "2 AI project guides", included: true },
+  { text: "1 AI project guide", included: true },
   { text: "All 10 project categories", included: true },
   { text: "Step-by-step AI instructions", included: true },
   { text: "Safety & tool lists", included: true },
@@ -51,12 +47,12 @@ const PRO_FEATURES = [
 ]
 
 const PRO_HIGHLIGHTS = [
-  { icon: Zap, label: "Unlimited guides", desc: "Generate as many DIY guides as you need, any time." },
-  { icon: Camera, label: "Inventory AI", desc: "Photograph your supplies and let AI catalog them instantly." },
-  { icon: MessageSquare, label: "Ask Rootstock", desc: "Get AI answers to any question on any step of your project." },
-  { icon: BookOpen, label: "Build journal", desc: "Document every project with notes, photos, and shareable logs." },
-  { icon: ShieldCheck, label: "MacGyver mode", desc: "Generate improvised solutions using what you already own." },
-  { icon: Wrench, label: "Inventory sync", desc: "Your inventory is cross-referenced in every guide you generate." },
+  { icon: Zap,        label: "Unlimited guides",   desc: "Generate as many DIY guides as you need, any time." },
+  { icon: Camera,     label: "Inventory AI",        desc: "Photograph your supplies and let AI catalog them instantly." },
+  { icon: MessageSquare, label: "Ask SteadCraft",   desc: "Get AI answers to any question on any step of your project." },
+  { icon: BookOpen,   label: "Build journal",        desc: "Document every project with notes, photos, and shareable logs." },
+  { icon: ShieldCheck, label: "MacGyver mode",      desc: "Generate improvised solutions using what you already own." },
+  { icon: Wrench,     label: "Inventory sync",       desc: "Your inventory is cross-referenced in every guide you generate." },
 ]
 
 export default function PricingPage() {
@@ -64,9 +60,9 @@ export default function PricingPage() {
   const { toast } = useToast()
   const { user } = useUser()
   const { tier } = useSustainData()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState<"trial" | "full" | null>(null)
 
-  const handleUpgrade = async () => {
+  const handleCheckout = async (withTrial: boolean) => {
     if (!user) {
       router.push("/signup")
       return
@@ -81,12 +77,10 @@ export default function PricingPage() {
       return
     }
 
-    setIsLoading(true)
+    setIsLoading(withTrial ? "trial" : "full")
     try {
-      const { url } = await createCheckoutSession(PRO_PRICE_ID, "subscription")
-      if (url) {
-        window.location.href = url
-      }
+      const { url } = await createCheckoutSession(PRO_PRICE_ID, "subscription", withTrial)
+      if (url) window.location.href = url
     } catch (err: any) {
       toast({
         title: "Could not start checkout",
@@ -94,7 +88,7 @@ export default function PricingPage() {
         variant: "destructive",
       })
     } finally {
-      setIsLoading(false)
+      setIsLoading(null)
     }
   }
 
@@ -114,9 +108,33 @@ export default function PricingPage() {
             Simple, honest pricing
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Start free. Upgrade when you&apos;re ready to build without limits.
+            Start free. Try Pro at no risk. Upgrade when you&apos;re ready.
           </p>
         </div>
+
+        {/* 30-day trial banner */}
+        {tier !== "paid" && (
+          <div className="mb-10 rounded-2xl border border-primary/30 bg-primary/5 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Gift className="h-6 w-6 text-primary shrink-0" />
+              <div>
+                <p className="font-headline font-bold text-foreground">Try Pro free for 30 days</p>
+                <p className="text-sm text-muted-foreground">No charge until day 31. Cancel any time before then and pay nothing.</p>
+              </div>
+            </div>
+            <Button
+              className="shrink-0 bg-primary text-primary-foreground font-bold px-6 h-11 uppercase tracking-wider hover:bg-primary/90"
+              onClick={() => handleCheckout(true)}
+              disabled={!!isLoading}
+            >
+              {isLoading === "trial" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Start Free Trial"
+              )}
+            </Button>
+          </div>
+        )}
 
         {/* Plans */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 mb-20">
@@ -135,7 +153,7 @@ export default function PricingPage() {
                 <span className="mb-1 text-sm text-muted-foreground">/ forever</span>
               </div>
               <CardDescription className="text-card-foreground/70">
-                Perfect for getting started and exploring what Rootstock can do.
+                Try SteadCraft and see what&apos;s possible with one full project guide.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -197,23 +215,32 @@ export default function PricingPage() {
                 </div>
               ))}
             </CardContent>
-            <CardFooter className="pt-6">
+            <CardFooter className="pt-6 flex flex-col gap-3">
               {tier === "paid" ? (
                 <Button className="w-full bg-primary/20 text-primary border border-primary/30 font-bold" disabled>
                   You&apos;re on Pro ✓
                 </Button>
               ) : (
-                <Button
-                  className="w-full bg-primary text-primary-foreground font-bold h-12 text-sm uppercase tracking-wider hover:bg-primary/90"
-                  onClick={handleUpgrade}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Upgrade to Pro"
-                  )}
-                </Button>
+                <>
+                  <Button
+                    className="w-full bg-primary text-primary-foreground font-bold h-12 text-sm uppercase tracking-wider hover:bg-primary/90"
+                    onClick={() => handleCheckout(true)}
+                    disabled={!!isLoading}
+                  >
+                    {isLoading === "trial" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Start 30-Day Free Trial"
+                    )}
+                  </Button>
+                  <button
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+                    onClick={() => handleCheckout(false)}
+                    disabled={!!isLoading}
+                  >
+                    {isLoading === "full" ? "Loading…" : `Skip trial — subscribe now at ${PRO_MONTHLY_PRICE}/mo`}
+                  </button>
+                </>
               )}
             </CardFooter>
           </Card>
@@ -247,23 +274,27 @@ export default function PricingPage() {
           <div className="space-y-6">
             {[
               {
+                q: "How does the free trial work?",
+                a: "Click 'Start Free Trial' and you'll be asked to enter a card. You won't be charged anything for 30 days. If you cancel before day 31, you pay nothing. If you don't cancel, your subscription starts automatically at $7/mo."
+              },
+              {
                 q: "Can I cancel any time?",
                 a: "Yes. Cancel from your account settings at any time. Your Pro access continues until the end of the billing period — no partial refunds, no surprises."
               },
               {
                 q: "What happens to my projects if I cancel?",
-                a: "Your saved projects, build logs, and inventory are yours and stay in your account. You just lose the ability to generate new unlimited guides — you return to the 2-credit free tier."
+                a: "Your saved projects, build logs, and inventory stay in your account. You return to the free tier with 1 project credit — enough to try the app but not run unlimited guides."
               },
               {
                 q: "Is my payment information safe?",
-                a: "Payments are handled entirely by Stripe, a PCI-compliant payment processor. Rootstock never stores your credit card number, expiry date, or CVV."
+                a: "Payments are handled entirely by Stripe, a PCI-compliant payment processor. SteadCraft never stores your credit card number, expiry date, or CVV."
               },
               {
                 q: "Do I need a paid account to browse projects?",
                 a: "No. You can explore all categories, view the community build feed, and use the app as a guest or free account without paying anything."
               },
               {
-                q: "What AI models power Rootstock?",
+                q: "What AI models power SteadCraft?",
                 a: "Project guides and inventory detection are powered by Llama 4 Scout running on Groq, with Gemini 2.5 Flash-Lite as a fallback. Both are state-of-the-art models optimised for speed and accuracy."
               },
             ].map((item, i) => (
@@ -283,17 +314,17 @@ export default function PricingPage() {
               Ready to build without limits?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Join homesteaders who are using Rootstock Pro to tackle every project with confidence.
+              Join homesteaders using SteadCraft Pro to tackle every project with confidence.
             </p>
             <Button
               size="lg"
               className="bg-primary text-primary-foreground font-bold px-10 h-12 uppercase tracking-wider hover:bg-primary/90"
-              onClick={handleUpgrade}
-              disabled={isLoading}
+              onClick={() => handleCheckout(true)}
+              disabled={!!isLoading}
             >
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : `Get Pro for ${PRO_MONTHLY_PRICE}/mo`}
+              {isLoading === "trial" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Try Pro Free for 30 Days"}
             </Button>
-            <p className="mt-4 text-xs text-muted-foreground">Cancel any time. No long-term commitment.</p>
+            <p className="mt-4 text-xs text-muted-foreground">No charge until day 31. Cancel any time.</p>
           </div>
         )}
 

@@ -114,7 +114,7 @@ export default function ContractorsPage() {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  "Rootstock analysis found high sentiment for <span className="text-primary font-medium">{pro.keywords[0]}</span> and specialized experience with homestead systems."
+                  "SteadCraft analysis found high sentiment for <span className="text-primary font-medium">{pro.keywords[0]}</span> and specialized experience with homestead systems."
                 </p>
               </CardContent>
               <CardFooter className="flex gap-2">

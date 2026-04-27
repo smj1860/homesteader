@@ -4,8 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { SupabaseProvider } from '@/supabase';
 
 export const metadata: Metadata = {
-  title: 'Rootstock - Homesteading Assistant',
-  description: 'AI-powered homesteading and self-sufficiency DIY project guide.',
+  title: 'SteadCraft - The Homestead is Our Craft',
+  description: 'AI-powered homesteading & DIY and self-sufficiency DIY project guide.',
 };
 
 export default function RootLayout({

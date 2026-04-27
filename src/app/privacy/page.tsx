@@ -5,7 +5,7 @@ import { Leaf } from "lucide-react"
 import Link from "next/link"
 
 const LAST_UPDATED = "April 26, 2025"
-const CONTACT_EMAIL = "support@rootstock.app"
+const CONTACT_EMAIL = "support@thesteadcraft.com"
 
 export default function PrivacyPage() {
   return (
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Leaf className="h-5 w-5 fill-current" />
             </div>
-            <span className="font-headline text-xl font-bold text-primary">Rootstock</span>
+            <span className="font-headline text-xl font-bold text-primary">SteadCraft</span>
           </div>
           <h1 className="font-headline text-4xl font-bold text-foreground">Privacy Policy</h1>
           <p className="text-sm text-muted-foreground">Last updated: {LAST_UPDATED}</p>
@@ -30,23 +30,23 @@ export default function PrivacyPage() {
 
           <section className="space-y-3 text-sm leading-relaxed">
             <p>
-              Rootstock is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and the choices you have. By using Rootstock, you agree to the practices described here.
+              SteadCraft is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and the choices you have. By using SteadCraft, you agree to the practices described here.
             </p>
           </section>
 
           <Section title="1. Information We Collect">
             <p><strong className="text-foreground">Account information.</strong> When you create an account, we collect your email address and a hashed version of your password. You may optionally provide a username and ZIP code.</p>
-            <p><strong className="text-foreground">Usage data.</strong> We collect information about how you interact with Rootstock, including the projects you generate, categories you browse, and features you use. This helps us improve the service.</p>
+            <p><strong className="text-foreground">Usage data.</strong> We collect information about how you interact with SteadCraft, including the projects you generate, categories you browse, and features you use. This helps us improve the service.</p>
             <p><strong className="text-foreground">Build log content.</strong> When you create a build log entry, we store the note text, any photos you upload, and whether you marked the entry public or private.</p>
             <p><strong className="text-foreground">Inventory data.</strong> Items you add to your homestead inventory are stored in your account.</p>
-            <p><strong className="text-foreground">Payment information.</strong> If you subscribe to Rootstock Pro, payment is handled by Stripe. We do not store your credit card number, expiry date, or CVV. We receive confirmation of successful payments and your subscription status from Stripe.</p>
-            <p><strong className="text-foreground">Anonymous sessions.</strong> If you use Rootstock as a guest, we assign a temporary anonymous session. No personally identifiable information is collected unless you create a full account.</p>
+            <p><strong className="text-foreground">Payment information.</strong> If you subscribe to SteadCraft Pro, payment is handled by Stripe. We do not store your credit card number, expiry date, or CVV. We receive confirmation of successful payments and your subscription status from Stripe.</p>
+            <p><strong className="text-foreground">Anonymous sessions.</strong> If you use SteadCraft as a guest, we assign a temporary anonymous session. No personally identifiable information is collected unless you create a full account.</p>
           </Section>
 
           <Section title="2. How We Use Your Information">
             <p>We use the information we collect to:</p>
             <ul>
-              <li>Provide, operate, and improve the Rootstock service.</li>
+              <li>Provide, operate, and improve the SteadCraft service.</li>
               <li>Personalise your experience, including displaying your inventory when generating project guides.</li>
               <li>Process payments and manage your subscription.</li>
               <li>Send transactional emails such as password resets (we do not send marketing emails unless you subscribe to the Homestead Weekly newsletter).</li>
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
 
           <Section title="6. Public Build Logs">
             <p>
-              If you mark a build log entry as public, the following information becomes visible to all Rootstock users and anyone with the shareable link: your username, the project title, your note, any attached photo, the category and subcategory, and the date posted.
+              If you mark a build log entry as public, the following information becomes visible to all SteadCraft users and anyone with the shareable link: your username, the project title, your note, any attached photo, the category and subcategory, and the date posted.
             </p>
             <p>
               Your email address is never displayed publicly. You can change a public log back to private at any time from the Project Journal view.
@@ -115,12 +115,12 @@ export default function PrivacyPage() {
 
           <Section title="8. Cookies and Local Storage">
             <p>
-              Rootstock uses browser local storage and session storage to maintain your login session and temporarily store generated project data within a session. We do not use third-party advertising cookies or tracking pixels.
+              SteadCraft uses browser local storage and session storage to maintain your login session and temporarily store generated project data within a session. We do not use third-party advertising cookies or tracking pixels.
             </p>
           </Section>
 
           <Section title="9. Third-Party Services">
-            <p>Rootstock uses the following third-party services, each with their own privacy practices:</p>
+            <p>SteadCraft uses the following third-party services, each with their own privacy practices:</p>
             <ul>
               <li><strong className="text-foreground">Supabase</strong> — database and authentication</li>
               <li><strong className="text-foreground">Vercel</strong> — hosting and edge infrastructure</li>
@@ -144,7 +144,7 @@ export default function PrivacyPage() {
 
           <Section title="11. Children's Privacy">
             <p>
-              Rootstock is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.
+              SteadCraft is not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.
             </p>
           </Section>
 
@@ -167,7 +167,7 @@ export default function PrivacyPage() {
 
           <Section title="13. Changes to This Policy">
             <p>
-              We may update this Privacy Policy from time to time. We will notify you of significant changes by updating the &quot;Last updated&quot; date at the top of this page. Continued use of Rootstock after changes are posted constitutes your acceptance of the revised policy.
+              We may update this Privacy Policy from time to time. We will notify you of significant changes by updating the &quot;Last updated&quot; date at the top of this page. Continued use of SteadCraft after changes are posted constitutes your acceptance of the revised policy.
             </p>
           </Section>
 
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
 
           <div className="h-px w-full bg-border/40 pt-4" />
           <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
-            <span>Rootstock &mdash; {LAST_UPDATED}</span>
+            <span>SteadCraft &mdash; {LAST_UPDATED}</span>
             <Link href="/terms" className="text-primary hover:underline">Terms of Service →</Link>
           </div>
         </div>

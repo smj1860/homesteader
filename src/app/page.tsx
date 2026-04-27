@@ -62,7 +62,7 @@ export default function Home() {
     try {
       await subscribeToNewsletter(email)
       toast({
-        title: "Welcome to Rootstock!",
+        title: "Welcome to SteadCraft!",
         description: "Your subscription to the Homestead Weekly is active.",
       })
       setEmail("")
@@ -97,7 +97,7 @@ export default function Home() {
             <div className="absolute inset-0 z-0">
                <Image 
                 src="https://picsum.photos/seed/homestead1/1200/600" 
-                alt="Rootstock Hero" 
+                alt="SteadCraft Hero" 
                 fill 
                 className="object-cover opacity-10"
                 data-ai-hint="homestead garden"
@@ -109,7 +109,7 @@ export default function Home() {
               </div>
               <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Master your homestead with precision.</p>
               <h1 className="font-headline text-4xl font-bold md:text-5xl lg:text-6xl leading-[1.1] max-w-4xl">
-                Rootstock: Homesteading and <br /><span className="text-accent">DIY for Everyone.</span>
+                SteadCraft: Homesteading and <br /><span className="text-accent">DIY for Everyone.</span>
               </h1>
               <p className="mt-8 max-w-2xl text-lg opacity-80 leading-relaxed">
                 Expert DIY instructions, tool lists, and pro-contractor referrals for every project — from building a shed to canning your harvest.

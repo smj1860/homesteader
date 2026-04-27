@@ -104,7 +104,7 @@ export default function SharedLogPage({ params }: { params: Promise<{ userId: st
                     <Zap className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="font-headline text-lg font-bold">Original Rootstock Guide</p>
+                    <p className="font-headline text-lg font-bold">Original SteadCraft Guide</p>
                     <p className="text-xs text-muted-foreground">The AI instructions used for this project</p>
                   </div>
                 </div>

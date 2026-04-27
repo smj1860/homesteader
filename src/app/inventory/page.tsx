@@ -61,7 +61,7 @@ export default function InventoryPage() {
         })
         toast({
           title: "Item Detected",
-          description: `Rootstock AI identified a ${item.name}.`,
+          description: `SteadCraft AI identified a ${item.name}.`,
         })
         setIsAddOpen(true)
       } else {
@@ -104,7 +104,7 @@ export default function InventoryPage() {
         <header className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
           <div>
             <h1 className="font-headline text-3xl font-bold">Inventory Manager</h1>
-            <p className="text-muted-foreground">Manage your on-hand tools, parts, and Rootstock assets.</p>
+            <p className="text-muted-foreground">Manage your on-hand tools, parts, and SteadCraft assets.</p>
           </div>
           <div className="flex gap-2">
              <Dialog open={isAddOpen} onOpenChange={(open) => {
@@ -237,7 +237,7 @@ export default function InventoryPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Snap a photo of your shed or pantry! Rootstock AI will automatically detect tools and items to populate your database. Use <b>AI Enhance</b> for better accuracy in dark areas.
+                Snap a photo of your shed or pantry! SteadCraft AI will automatically detect tools and items to populate your database. Use <b>AI Enhance</b> for better accuracy in dark areas.
               </p>
             </CardContent>
           </Card>

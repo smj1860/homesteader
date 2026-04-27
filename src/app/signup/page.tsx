@@ -35,7 +35,7 @@ export default function SignUpPage() {
         if (error) throw error
         toast({
           title: "Account created!",
-          description: "Welcome to Rootstock. Let's get building.",
+          description: "Welcome to SteadCraft. Let's get building.",
         })
         router.push("/projects")
       } else {
@@ -89,7 +89,7 @@ export default function SignUpPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
             <Leaf className="h-8 w-8 fill-current" />
           </div>
-          <h1 className="font-headline text-3xl font-bold text-foreground">Rootstock</h1>
+          <h1 className="font-headline text-3xl font-bold text-foreground">SteadCraft</h1>
           <p className="text-center text-sm text-muted-foreground">
             {mode === "signup"
               ? "Create your free account to start building."

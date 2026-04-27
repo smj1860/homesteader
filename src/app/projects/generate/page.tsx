@@ -69,7 +69,7 @@ function GenerateProjectContent() {
     <main className="container mx-auto max-w-2xl px-4">
       <header className="mb-8">
         <Button variant="ghost" className="mb-4" onClick={() => router.back()}>← Back</Button>
-        <h1 className="font-headline text-3xl font-bold text-primary">Rootstock Project Guide</h1>
+        <h1 className="font-headline text-3xl font-bold text-primary">SteadCraft Project Guide</h1>
         <div className="flex items-center gap-2 mt-2">
           <Badge variant="secondary" className="capitalize">{category}</Badge>
           <Badge variant="outline" className="capitalize">{subcategory}</Badge>
@@ -120,7 +120,7 @@ function GenerateProjectContent() {
               <ShieldAlert className="h-4 w-4" />
               <AlertTitle>Liability Warning</AlertTitle>
               <AlertDescription className="text-xs">
-                MacGyver instructions are makeshift and potentially risky. Rootstock assumes no liability. Use at your own risk.
+                MacGyver instructions are makeshift and potentially risky. SteadCraft assumes no liability. Use at your own risk.
               </AlertDescription>
             </Alert>
           )}
