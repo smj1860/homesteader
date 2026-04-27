@@ -117,7 +117,7 @@ export default function SignUpPage() {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
-                  className="bg-background border-border/40" text-foreground placeholder:text-muted-foreground"
+                  className="bg-background border-border/40 text-foreground placeholder:text-muted-foreground"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -130,7 +130,7 @@ export default function SignUpPage() {
                   id="password"
                   type="password"
                   placeholder={mode === "signup" ? "At least 6 characters" : "Your password"}
-                  className="bg-background border-border/40"
+                  className="bg-background border-border/40 text-foreground placeholder:text-muted-foreground"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -138,11 +138,18 @@ export default function SignUpPage() {
                 />
               </div>
 
+              {/* Forgot password — only shown in sign-in mode */}
               {mode === "signin" && (
                 <div className="text-right -mt-1">
-                  <a href="/reset-password" className="text-xs text-muted-foreground hover:text-primary underline underline-offset-2">Forgot password?</a>
+                  <a
+                    href="/reset-password"
+                    className="text-xs text-muted-foreground hover:text-primary underline underline-offset-2"
+                  >
+                    Forgot password?
+                  </a>
                 </div>
               )}
+
               <Button
                 type="submit"
                 className="w-full bg-primary text-primary-foreground font-bold h-12 text-sm uppercase tracking-wider"
