@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Package, Users, Wrench, Leaf, PlayCircle, Star } from "lucide-react"
+import { Home, Package, Users, Wrench, Leaf, PlayCircle, Star, UserCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { name: "Tool Reviews", href: "/tools", icon: Star },
   { name: "Contractors", href: "/contractors", icon: Users },
   { name: "Inventory", href: "/inventory", icon: Package },
+  { name: "Account", href: "/account", icon: UserCircle },
 ]
 
 export function Navigation() {
@@ -29,7 +30,7 @@ export function Navigation() {
               SteadCraft
             </span>
             <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary/80 mt-1 hidden sm:block">
-              The Homestead is Our Craft
+              The Homestead Is Our Craft
             </span>
           </div>
         </Link>

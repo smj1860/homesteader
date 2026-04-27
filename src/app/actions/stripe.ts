@@ -9,46 +9,53 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 /**
  * Creates a Stripe Checkout Session for a subscription or one-time purchase.
- * @param priceId   The Stripe Price ID for the product.
- * @param mode      'subscription' | 'payment'
- * @param withTrial If true, applies a 30-day free trial. No charge until day 31.
- *                  Stripe still collects the card at checkout but does not charge it.
+ * @param priceId    The Stripe Price ID.
+ * @param mode       'subscription' | 'payment'
+ * @param withTrial  If true, applies a 30-day free trial. Card collected but not charged until day 31.
  */
 export async function createCheckoutSession(
   priceId: string,
   mode: 'subscription' | 'payment',
   withTrial = false,
 ) {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('Stripe Secret Key is not configured.');
-  }
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('Stripe Secret Key is not configured.');
 
   const headerList = await headers();
   const origin = headerList.get('origin');
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode,
-      // Trial: collect card now, first charge after 30 days
-      ...(withTrial && mode === 'subscription'
-        ? {
-            subscription_data: {
-              trial_period_days: 30,
-              trial_settings: {
-                end_behavior: { missing_payment_method: 'cancel' },
-              },
-            },
-            payment_method_collection: 'always',
-          }
-        : {}),
-      success_url: `${origin}/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/pricing`,
-    });
+  const session = await stripe.checkout.sessions.create({
+    line_items: [{ price: priceId, quantity: 1 }],
+    mode,
+    ...(withTrial && mode === 'subscription'
+      ? {
+          subscription_data: {
+            trial_period_days: 30,
+            trial_settings: { end_behavior: { missing_payment_method: 'cancel' } },
+          },
+          payment_method_collection: 'always',
+        }
+      : {}),
+    success_url: `${origin}/account?upgraded=true`,
+    cancel_url: `${origin}/pricing`,
+  });
 
-    return { url: session.url };
-  } catch (error: any) {
-    console.error('Error creating checkout session:', error);
-    throw new Error(error.message || 'Failed to create checkout session.');
-  }
+  return { url: session.url };
+}
+
+/**
+ * Creates a Stripe Billing Portal session so users can manage/cancel their subscription.
+ * @param customerId  The Stripe customer ID stored on the user's row.
+ */
+export async function createBillingPortalSession(customerId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('Stripe Secret Key is not configured.');
+
+  const headerList = await headers();
+  const origin = headerList.get('origin');
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: `${origin}/account`,
+  });
+
+  return { url: session.url };
 }

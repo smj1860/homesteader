@@ -62,8 +62,8 @@ export default function Home() {
     try {
       await subscribeToNewsletter(email)
       toast({
-        title: "Welcome to SteadCraft!",
-        description: "Your subscription to the Homestead Weekly is active.",
+        title: "Welcome to Grain & Grit!",
+        description: "You are now on the list. First issue coming soon.",
       })
       setEmail("")
     } catch (err) {
@@ -288,7 +288,7 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 font-headline text-lg text-card-foreground">
                   <Mail className="h-5 w-5 text-accent" />
-                  Homestead Weekly
+                  Grain & Grit
                 </CardTitle>
                 <CardDescription className="text-card-foreground/70">Get tips, guides, and tool deals in your inbox.</CardDescription>
               </CardHeader>

@@ -117,7 +117,7 @@ export default function SignUpPage() {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
-                  className="bg-background border-border/40 text-foreground placeholder:text-muted-foreground"
+                  className="bg-background border-border/40" text-foreground placeholder:text-muted-foreground"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

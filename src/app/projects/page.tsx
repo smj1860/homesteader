@@ -220,7 +220,7 @@ export default function ProjectsPage() {
       <main className="container mx-auto px-4">
         <header className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
           <div>
-            <h1 className="font-headline text-3xl font-bold text-primary">Rootstock Project Hub</h1>
+            <h1 className="font-headline text-3xl font-bold text-primary">SteadCraft Project Hub</h1>
             <p className="text-muted-foreground">Built for every corner of your land.</p>
           </div>
           <div className="relative w-full max-w-sm">
@@ -233,6 +233,36 @@ export default function ProjectsPage() {
             />
           </div>
         </header>
+
+
+        {/* Free guide activation banner */}
+        {tier === 'free' && credits > 0 && (
+          <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5 text-primary shrink-0" />
+              <div>
+                <p className="font-headline font-bold text-foreground text-sm">You have 1 free project guide waiting</p>
+                <p className="text-xs text-muted-foreground">Pick any category below and build something — no card required.</p>
+              </div>
+            </div>
+            <Badge className="bg-primary text-primary-foreground shrink-0">Free</Badge>
+          </div>
+        )}
+
+        {tier === 'free' && credits === 0 && (
+          <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5 text-amber-600 shrink-0" />
+              <div>
+                <p className="font-headline font-bold text-foreground text-sm">You have used your free guide</p>
+                <p className="text-xs text-muted-foreground">Try Pro free for 30 days — no charge until day 31.</p>
+              </div>
+            </div>
+            <Button size="sm" className="bg-primary text-primary-foreground font-bold shrink-0" onClick={() => setShowPricing(true)}>
+              Try Pro Free
+            </Button>
+          </div>
+        )}
 
         <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredCategories.map((cat) => (
@@ -294,7 +324,7 @@ export default function ProjectsPage() {
           <Sparkles className="mx-auto h-12 w-12 text-accent opacity-50 mb-4" />
           <h2 className="font-headline text-2xl font-bold mb-2">Expert AI Guidance</h2>
           <p className="opacity-80 max-w-2xl mx-auto mb-6">
-            Rootstock's AI is trained on thousands of technical homesteading documents. 
+            SteadCraft's AI is trained on thousands of technical homesteading documents. 
             Choose your niche and build something lasting today.
           </p>
           <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" asChild>
