@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/ssr';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-01-27' as any,
-});
+// ── Lazy helpers — initialized at request time, not build time ───────────────
 
-// ── Supabase admin client (service role — never exposed to browser) ──────────
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not set');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-01-27' as any,
+  });
+}
+
 function supabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,16 +21,14 @@ function supabaseAdmin() {
   );
 }
 
-// ── Update user premium status by Stripe customer ID or email ────────────────
+// ── Update user premium status ────────────────────────────────────────────────
 async function setPremium(
   customerId: string,
   isPremium: boolean,
   trialEndsAt?: number | null,
 ) {
+  const stripe = getStripe();
   const supabase = supabaseAdmin();
-
-  // First try to find user by stripe_customer_id column (fastest)
-  // Fall back to looking up the customer email from Stripe → match Supabase auth user
   let userId: string | null = null;
 
   const { data: byCustomer } = await supabase
@@ -36,13 +40,11 @@ async function setPremium(
   if (byCustomer?.id) {
     userId = byCustomer.id;
   } else {
-    // Retrieve customer from Stripe to get their email
     const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
     if (customer.email) {
       const { data: authUser } = await supabase.auth.admin.getUserByEmail(customer.email);
       if (authUser?.user) {
         userId = authUser.user.id;
-        // Persist the mapping so future events are instant
         await supabase
           .from('users')
           .update({ stripe_customer_id: customerId })
@@ -58,7 +60,9 @@ async function setPremium(
 
   const update: Record<string, unknown> = { is_premium: isPremium };
   if (trialEndsAt !== undefined) {
-    update.trial_ends_at = trialEndsAt ? new Date(trialEndsAt * 1000).toISOString() : null;
+    update.trial_ends_at = trialEndsAt
+      ? new Date(trialEndsAt * 1000).toISOString()
+      : null;
   }
 
   const { error } = await supabase.from('users').update(update).eq('id', userId);
@@ -67,11 +71,16 @@ async function setPremium(
 
 // ── POST handler ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const stripe = getStripe();
+
   const body = await req.text();
-  const sig = req.headers.get('stripe-signature');
+  const sig  = req.headers.get('stripe-signature');
 
   if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: 'Missing signature or webhook secret' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing signature or webhook secret' },
+      { status: 400 }
+    );
   }
 
   let event: Stripe.Event;
@@ -84,49 +93,33 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
-      // ── Trial or direct subscription started ───────────────────────────
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         if (session.mode === 'subscription' && session.customer) {
-          // Fetch subscription to check trial status
           const sub = await stripe.subscriptions.retrieve(session.subscription as string);
-          const trialEnd = sub.trial_end ?? null;
-          await setPremium(session.customer as string, true, trialEnd);
+          await setPremium(session.customer as string, true, sub.trial_end ?? null);
         }
         break;
       }
-
-      // ── Subscription updated (trial → active, cancelled, paused, etc.) ─
       case 'customer.subscription.updated': {
         const sub = event.data.object as Stripe.Subscription;
         const isActive = sub.status === 'active' || sub.status === 'trialing';
-        await setPremium(
-          sub.customer as string,
-          isActive,
-          sub.trial_end,
-        );
+        await setPremium(sub.customer as string, isActive, sub.trial_end);
         break;
       }
-
-      // ── Subscription ended / cancelled / trial cancelled ───────────────
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription;
         await setPremium(sub.customer as string, false, null);
         break;
       }
-
-      // ── Payment failed — grace period handled by Stripe dunning ────────
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
-        // Only revoke after final failure (attempt_count is configurable in Stripe)
         if ((invoice as any).attempt_count >= 3 && invoice.customer) {
           await setPremium(invoice.customer as string, false, null);
         }
         break;
       }
-
       default:
-        // Unhandled event — return 200 so Stripe doesn't retry
         break;
     }
   } catch (err) {
@@ -136,6 +129,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-
-// Stripe sends raw bodies — disable Next.js body parsing
-export const config = { api: { bodyParser: false } };
