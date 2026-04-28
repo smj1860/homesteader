@@ -2,18 +2,19 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Package, Users, Wrench, Leaf, PlayCircle, Star, UserCircle } from "lucide-react"
+import { Home, Package, Users, Wrench, Leaf, PlayCircle, Star, UserCircle, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { TrialBanner } from "@/components/TrialBanner"
 
 const navItems = [
-  { name: "Dashboard",   href: "/",           icon: Home },
-  { name: "DIY Projects", href: "/projects",  icon: Wrench },
-  { name: "Workshop",    href: "/workshop",   icon: PlayCircle },
-  { name: "Tool Reviews", href: "/tools",     icon: Star },
-  { name: "Contractors", href: "/contractors", icon: Users },
-  { name: "Inventory",   href: "/inventory",  icon: Package },
-  { name: "Account",     href: "/account",    icon: UserCircle },
+  { name: "Dashboard",    href: "/",           icon: Home },
+  { name: "DIY Projects", href: "/projects",   icon: Wrench },
+  { name: "Workshop",     href: "/workshop",   icon: PlayCircle },
+  { name: "Resources",    href: "/resources",  icon: BookOpen },
+  { name: "Tool Reviews", href: "/tools",      icon: Star },
+  { name: "Contractors",  href: "/contractors", icon: Users },
+  { name: "Inventory",    href: "/inventory",  icon: Package },
+  { name: "Account",      href: "/account",    icon: UserCircle },
 ]
 
 export function Navigation() {
