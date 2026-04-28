@@ -1,0 +1,22 @@
+{
+  "name": "SteadCraft",
+  "short_name": "SteadCraft",
+  "description": "The homestead is our craft. AI-powered project guides for homesteaders and DIYers.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#264228",
+  "background_color": "#F7F3EB",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "portrait"
+}
