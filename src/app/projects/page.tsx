@@ -24,8 +24,8 @@ import {
   Leaf, 
   ChevronRight,
   ShieldAlert,
-  Wrench
-Wind, } from "lucide-react"
+  Wrench,
+Wind } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
