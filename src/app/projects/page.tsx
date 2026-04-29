@@ -25,7 +25,7 @@ import {
   ChevronRight,
   ShieldAlert,
   Wrench
-} from "lucide-react"
+Wind, } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -120,6 +120,23 @@ const categories = [
       "Outbuilding & barn wiring",
       "Low-voltage & lighting",
       "EV & equipment charging"
+    ]
+  },
+  {
+    id: "hvac",
+    name: "HVAC",
+    icon: Wind,
+    desc: "Heating, cooling, and ventilation — from wood stoves to mini-splits and propane systems.",
+    contractorOnly: true,
+    subcategories: [
+      "Wood stoves & pellet stoves",
+      "Propane & fuel oil heating",
+      "Mini-split installation & repair",
+      "Central HVAC maintenance",
+      "Ductwork & ventilation",
+      "Whole-house fans & attic ventilation",
+      "Heat pumps & geothermal",
+      "Air quality & filtration"
     ]
   },
   {

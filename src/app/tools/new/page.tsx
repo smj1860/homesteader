@@ -32,6 +32,22 @@ export default function NewToolReviewPage() {
 
   const [pros, setPros] = useState<string[]>([""])
   const [cons, setCons] = useState<string[]>([""])
+  // Admin-only page — redirect anyone who isn't marked as admin
+  useEffect(() => {
+    if (isUserLoading) return
+    if (!user) { router.push("/signup"); return }
+    // Check is_admin from users table
+    supabase
+      .from("users")
+      .select("is_admin")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (!data?.is_admin) router.push("/tools")
+      })
+  }, [user, isUserLoading, supabase, router])
+
+
 
   const handleProsChange = (index: number, value: string) => {
     const newPros = [...pros]

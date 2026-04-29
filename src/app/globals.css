@@ -4,20 +4,22 @@
 
 @layer base {
   :root {
-    --background: 40 40% 98%; /* Cream / Off-white */
-    --foreground: 100 48% 12%; /* Deep Forest Green */
-    --card: 100 48% 15%; /* Dark Forest Green for Boxes */
-    --card-foreground: 40 40% 98%; /* Cream text in boxes */
+    --background: 40 40% 98%;
+    --foreground: 100 48% 12%;
+    --card: 100 48% 15%;
+    --card-foreground: 40 40% 98%;
     --popover: 40 40% 98%;
     --popover-foreground: 100 48% 12%;
-    --primary: 100 48% 15%; 
+    --primary: 100 48% 15%;
     --primary-foreground: 40 40% 98%;
     --secondary: 83 20% 90%;
     --secondary-foreground: 100 48% 12%;
     --muted: 83 20% 92%;
     --muted-foreground: 100 30% 25%;
-    --accent: 83 38% 74%; /* Sage Green */
+    --accent: 83 38% 74%;
     --accent-foreground: 100 48% 10%;
+    --leather: 20 55% 36%;        /* #8D4E2D — vintage leather */
+    --leather-light: 20 45% 55%;  /* lighter leather for hover/tint */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 100 20% 85%;
@@ -41,6 +43,8 @@
     --muted-foreground: 83 20% 65%;
     --accent: 83 38% 74%;
     --accent-foreground: 100 48% 10%;
+    --leather: 20 55% 42%;
+    --leather-light: 20 45% 55%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 100 20% 20%;
@@ -54,9 +58,24 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline;
+  /* Old Standard TT for all headings and headline-classed elements */
+  h1, h2, h3, h4, h5, h6,
+  .font-headline {
+    font-family: 'Old Standard TT', Georgia, 'Times New Roman', serif;
   }
 }
+
+/* Leather color utilities */
+.text-leather       { color: hsl(var(--leather)); }
+.bg-leather         { background-color: hsl(var(--leather)); }
+.border-leather     { border-color: hsl(var(--leather)); }
+.bg-leather\/10     { background-color: hsl(var(--leather) / 0.10); }
+.bg-leather\/20     { background-color: hsl(var(--leather) / 0.20); }
+.text-leather-light { color: hsl(var(--leather-light)); }
+
+/* Scrollbar hide utility — used in mobile nav */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
