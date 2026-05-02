@@ -1,227 +1,378 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useSupabaseClient } from "@/supabase"
+import { useState, useEffect } from "react"
 import { Navigation } from "@/components/Navigation"
+import { useSustainData } from "@/hooks/use-sustain-data"
+import { useCollection, useSupabaseClient } from "@/supabase"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Leaf, Loader2 } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import {
+  Sprout, Wrench, Package, Users, ArrowRight, Lightbulb,
+  Sun, Beef, Hammer, PlayCircle, Star, Mail, Leaf, Calendar,
+  MessageSquare, Loader2, Flame, Zap, Droplets, BookOpen, Wind
+} from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
+import { useToast } from "@/hooks/use-toast"
+import { subscribeToNewsletter } from "@/app/actions/newsletter"
 
-type Mode = "signin" | "signup"
-
-export default function SignUpPage() {
-  const router = useRouter()
+export default function Home() {
+  const { tier, credits } = useSustainData()
   const { toast } = useToast()
   const supabase = useSupabaseClient()
-
-  const [mode, setMode] = useState<Mode>("signup")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => { 
+    setMounted(true) 
+    
+    // Check initial session
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+    })
+
+    // Listen for auth changes to update buttons immediately
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
+
+  const { data: recentLogs, isLoading: logsLoading } = useCollection('build_logs', {
+    filters: { is_public: true },
+    orderBy: 'created_at',
+    ascending: false,
+  })
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
-    setIsLoading(true)
-
+    if (!email) return
+    setIsSubmitting(true)
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password })
-        if (error) throw error
-        toast({
-          title: "Account created!",
-          description: "Welcome to SteadCraft. Let's get building.",
-        })
-        router.push("/projects")
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
-        toast({
-          title: "Welcome back!",
-          description: "You are now signed in.",
-        })
-        router.push("/projects")
-      }
-    } catch (err: any) {
-      toast({
-        title: mode === "signup" ? "Sign up failed" : "Sign in failed",
-        description: err.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      })
+      await subscribeToNewsletter(email)
+      toast({ title: "Welcome to Grain & Grit!", description: "You're on the list. First issue coming soon." })
+      setEmail("")
+    } catch {
+      toast({ title: "Subscription failed", description: "We couldn't add you to the list right now.", variant: "destructive" })
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  const handleAnonymous = async () => {
-    setIsLoading(true)
-    try {
-      const { error } = await supabase.auth.signInAnonymously()
-      if (error) throw error
-      toast({
-        title: "Continuing as guest",
-        description: "You can create an account any time to save your work.",
-      })
-      router.push("/projects")
-    } catch (err: any) {
-      toast({
-        title: "Could not continue as guest",
-        description: err.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+  const formatDate = (dateString: string) => {
+    if (!mounted) return ""
+    try { return new Date(dateString).toLocaleDateString() }
+    catch { return "Recently" }
   }
 
   return (
     <div className="min-h-screen bg-background pb-20 pt-20">
       <Navigation />
-      <main className="container mx-auto flex max-w-md flex-col items-center px-4 pt-12">
 
-        {/* Logo mark */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-            <Leaf className="h-8 w-8 fill-current" />
-          </div>
-          <h1 className="font-headline text-3xl font-bold text-foreground">SteadCraft</h1>
-          <p className="text-center text-sm text-muted-foreground">
-            {mode === "signup"
-              ? "Create your free account to start building."
-              : "Welcome back — sign in to continue."}
-          </p>
-        </div>
+      <main className="container mx-auto px-4">
 
-        <Card className="w-full border-border/40 bg-card shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="font-headline text-xl text-card-foreground">
-              {mode === "signup" ? "Create account" : "Sign in"}
-            </CardTitle>
-            <CardDescription className="text-card-foreground/70">
-              {mode === "signup"
-                ? "Free forever. No credit card required."
-                : "Enter your email and password below."}
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="bg-background border-border/40 text-foreground placeholder:text-muted-foreground"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={mode === "signup" ? "At least 6 characters" : "Your password"}
-                  className="bg-background border-border/40 text-foreground placeholder:text-muted-foreground"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+        {/* ── Hero ─────────────────────────────────────────────────────────── */}
+        <section className="mb-12 overflow-hidden rounded-3xl bg-card border border-border/40 text-card-foreground shadow-sm relative">
+          <div className="relative min-h-[480px] w-full flex items-center">
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="https://picsum.photos/seed/homestead1/1200/600"
+                alt="SteadCraft — homesteaders at work"
+                fill
+                className="object-cover opacity-10"
+              />
+            </div>
+            <div className="relative z-10 w-full p-8 md:p-16">
+              <div className="mb-6 h-16 w-16">
+                <Image
+                  src="/android-chrome-192x192.png"
+                  alt="SteadCraft"
+                  width={64}
+                  height={64}
+                  className="rounded-xl shadow-md"
                 />
               </div>
 
-              {/* Forgot password — only shown in sign-in mode */}
-              {mode === "signin" && (
-                <div className="text-right -mt-1">
-                  <a
-                    href="/reset-password"
-                    className="text-xs text-muted-foreground hover:text-primary underline underline-offset-2"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
-              )}
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-leather-light mb-4">
+                The homestead is our craft.
+              </p>
 
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground font-bold h-12 text-sm uppercase tracking-wider"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : mode === "signup" ? (
-                  "Create Account"
+              <h1 className="font-headline text-4xl font-bold md:text-5xl lg:text-6xl leading-[1.1] max-w-3xl">
+                Where homesteaders{" "}
+                <span className="text-leather">build, grow,</span>
+                <br />and figure it out together.
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-lg opacity-80 leading-relaxed">
+                Step-by-step project guides for any job on your land — from fixing a fence to putting up a harvest. Real knowledge from a community that actually does the work.
+              </p>
+
+              <div className="mt-10 flex flex-wrap gap-4">
+                {user ? (
+                  <>
+                    <Button
+                      size="lg"
+                      className="bg-leather text-white hover:bg-leather/90 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/projects">Start a Project</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-leather text-leather hover:bg-leather/10 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/account">My Account</Link>
+                    </Button>
+                  </>
                 ) : (
-                  "Sign In"
+                  <>
+                    <Button
+                      size="lg"
+                      className="bg-leather text-white hover:bg-leather/90 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/signup">Join the Community</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-leather text-leather hover:bg-leather/10 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/signup?mode=signin">Sign In</Link>
+                    </Button>
+                  </>
                 )}
-              </Button>
-            </form>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border/40" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or</span>
+
+              <div className="mt-10 flex flex-wrap gap-6 text-sm text-card-foreground/60">
+                <span><strong className="text-card-foreground">11</strong> project categories</span>
+                <span><strong className="text-card-foreground">Free</strong> to get started</span>
+                <span><strong className="text-card-foreground">AI-powered</strong> step-by-step guides</span>
               </div>
             </div>
+          </div>
+        </section>
 
-            <Button
-              variant="outline"
-              className="w-full border-border/40 text-card-foreground h-12 text-sm"
-              onClick={handleAnonymous}
-              disabled={isLoading}
-            >
-              Continue as Guest
-            </Button>
-          </CardContent>
+        {/* ── How it Works ─────────────────────────────────────────────────── */}
+        <section className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="font-headline text-3xl font-bold text-foreground">How SteadCraft works</h2>
+            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
+              Pick a project, get a guide built around what you own and what you know. No fluff, no jargon.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { step: "01", title: "Pick your project", desc: "Choose from 11 categories covering everything on the homestead — or describe something custom." },
+              { step: "02", title: "Get a real guide", desc: "AI builds a step-by-step plan with safety notes, a tool list, and instructions matched to your skill level." },
+              { step: "03", title: "Ask questions as you go", desc: "Stuck on a step? Ask SteadCraft. Get a direct answer in plain language without starting over." },
+              { step: "04", title: "Share what you built", desc: "Log your progress, post photos, and share with a community that appreciates honest work." },
+            ].map((item) => (
+              <Card key={item.step} className="bg-card text-card-foreground border-border/40 shadow-sm hover:shadow-md transition-all">
+                <CardContent className="pt-8 pb-6 flex flex-col gap-3">
+                  <span className="font-headline text-4xl font-bold text-leather/40">{item.step}</span>
+                  <h3 className="font-headline font-bold text-base text-card-foreground">{item.title}</h3>
+                  <p className="text-sm text-card-foreground/70 leading-relaxed">{item.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
 
-          <CardFooter className="flex justify-center pb-6 pt-0">
-            {mode === "signup" ? (
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setMode("signin")}
-                  className="font-semibold text-primary hover:underline"
-                >
-                  Sign in
-                </button>
-              </p>
+        {/* ── Categories ───────────────────────────────────────────────────── */}
+        <section className="mb-20">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="font-headline text-2xl font-bold text-foreground">Built for every corner of your land</h2>
+            <Link href="/projects" className="text-xs font-bold uppercase text-leather hover:underline tracking-wider">
+              View All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+            {[
+              { name: "Garden & Land",      icon: Sprout,    id: "landscaping" },
+              { name: "Cooking & Baking",   icon: Flame,     id: "cooking" },
+              { name: "Canning",            icon: Package,   id: "canning" },
+              { name: "Auto & Small Engine",icon: Wrench,    id: "auto" },
+              { name: "Plumbing",           icon: Droplets,  id: "plumbing" },
+              { name: "Electrical",         icon: Zap,       id: "electrical" },
+              { name: "HVAC",               icon: Wind,      id: "hvac" },
+              { name: "Solar & Off-Grid",   icon: Sun,       id: "solar" },
+              { name: "Animals & Livestock",icon: Beef,      id: "livestock" },
+              { name: "Building",           icon: Hammer,    id: "building" },
+              { name: "Resources",          icon: BookOpen,  id: "resources" },
+              { name: "Self-Sufficiency",   icon: Leaf,      id: "self-sufficiency" },
+            ].map((cat) => (
+              <Link key={cat.id} href={`/projects?category=${cat.id}`}>
+                <Card className="hover:ring-2 hover:ring-leather transition-all hover:shadow-md h-full bg-card text-card-foreground border-border/40 shadow-sm group">
+                  <CardContent className="flex flex-col items-center justify-center p-5">
+                    <div className="mb-3 rounded-full p-3 bg-leather/10 text-leather group-hover:bg-leather/20 transition-colors">
+                      <cat.icon className="h-5 w-5" />
+                    </div>
+                    <span className="font-bold text-[10px] uppercase tracking-widest text-center text-card-foreground leading-tight">{cat.name}</span>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Community Feed ───────────────────────────────────────────────── */}
+        <section className="mb-16">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="font-headline text-2xl font-bold text-foreground">Community Build Feed</h2>
+            <Link href="/projects" className="text-xs font-bold uppercase text-leather hover:underline tracking-wider">
+              View All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {logsLoading ? (
+              [...Array(3)].map((_, i) => <Card key={i} className="animate-pulse h-[300px] bg-card" />)
+            ) : recentLogs?.length ? (
+              recentLogs.slice(0, 6).map((log) => (
+                <Link key={log.id} href={`/share/${log.user_id}/${log.project_id}/${log.id}`}>
+                  <Card className="h-full group hover:ring-2 hover:ring-leather transition-all overflow-hidden bg-card border-border/40 shadow-sm text-card-foreground">
+                    {log.photo_url && (
+                      <div className="relative h-40 w-full overflow-hidden">
+                        <Image src={log.photo_url} alt={log.project_title} fill className="object-cover group-hover:scale-105 transition-transform" />
+                      </div>
+                    )}
+                    <CardHeader className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant="secondary" className="text-[10px]">{log.subcategory}</Badge>
+                        <span className="text-[10px] text-card-foreground/50">{formatDate(log.created_at)}</span>
+                      </div>
+                      <CardTitle className="text-base font-headline line-clamp-1 text-card-foreground">{log.project_title}</CardTitle>
+                      <CardDescription className="line-clamp-2 text-xs text-card-foreground/60">{log.note}</CardDescription>
+                    </CardHeader>
+                    <CardFooter className="p-4 pt-0 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-[10px] text-card-foreground/50">
+                        <Users className="h-3 w-3" /> {log.username}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-leather opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </CardFooter>
+                  </Card>
+                </Link>
+              ))
             ) : (
-              <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setMode("signup")}
-                  className="font-semibold text-primary hover:underline"
-                >
-                  Sign up
-                </button>
-              </p>
+              <div className="col-span-full py-12 text-center text-card-foreground/60 border-2 border-dashed border-border rounded-2xl">
+                No public logs yet. Be the first to share your progress!
+              </div>
             )}
-          </CardFooter>
-        </Card>
+          </div>
+        </section>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          By signing up you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-foreground">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="underline hover:text-foreground">
-            Privacy Policy
-          </Link>
-          .
-        </p>
+        {/* ── Bottom grid ──────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-4">
+            <Link href="/workshop">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
+                    <PlayCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg text-card-foreground font-headline">Pro Workshop</CardTitle>
+                    <CardDescription className="text-card-foreground/60">Deep-dive video guides on specialized homestead skills</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+            <Link href="/tools">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
+                    <Star className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg text-card-foreground font-headline">Tool Reviews</CardTitle>
+                    <CardDescription className="text-card-foreground/60">Honest assessments of tools that hold up to homestead life</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+            <Link href="/resources">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
+                    <BookOpen className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg text-card-foreground font-headline">Resource Library</CardTitle>
+                    <CardDescription className="text-card-foreground/60">Planting schedules, seed saving, pruning guides, and more — by zone</CardDescription>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          </div>
+
+          <aside className="space-y-6">
+            <Card className="border-border/40 bg-card text-card-foreground shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 font-headline text-lg text-card-foreground">
+                  <Mail className="h-5 w-5 text-leather" /> Grain & Grit
+                </CardTitle>
+                <CardDescription className="text-card-foreground/60">
+                  Tips, guides, and seasonal wisdom in your inbox.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubscribe} className="space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    className="bg-background border-border text-foreground"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-leather text-white hover:bg-leather/90 font-bold uppercase tracking-wider text-xs h-12"
+                  >
+                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe Free"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/40 bg-card text-card-foreground shadow-sm">
+              <CardHeader>
+                <CardTitle className="font-headline text-lg text-card-foreground">Your Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-card-foreground/60">Plan</span>
+                  <Badge variant="outline" className="text-leather border-leather/40">
+                    {tier === 'paid' ? 'Pro' : 'Free'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-card-foreground/60">Guides</span>
+                  <span className="font-bold text-card-foreground">{tier === 'paid' ? 'Unlimited' : credits}</span>
+                </div>
+                <Button
+                  className="w-full border-leather text-leather hover:bg-leather/10"
+                  variant="outline"
+                  size="sm"
+                  asChild
+                >
+                   <Link href={user ? "/account" : "/signup?mode=signin"}>
+                    {user ? "My Account" : "Sign In to View"}
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </aside>
+        </div>
       </main>
     </div>
   )

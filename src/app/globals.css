@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,50 +9,60 @@
   :root {
     --background: 40 40% 98%;
     --foreground: 100 48% 12%;
+    
+    /* Primary Action Color - Set to Leather */
+    --primary: 20 55% 36%;           /* #8D4E2D Leather */
+    --primary-foreground: 0 0% 100%; /* White text for buttons */
+    
     --card: 100 48% 15%;
     --card-foreground: 40 40% 98%;
     --popover: 40 40% 98%;
     --popover-foreground: 100 48% 12%;
-    --primary: 100 48% 15%;
-    --primary-foreground: 40 40% 98%;
     --secondary: 83 20% 90%;
     --secondary-foreground: 100 48% 12%;
     --muted: 83 20% 92%;
     --muted-foreground: 100 30% 25%;
-    --accent: 83 38% 74%;
-    --accent-foreground: 100 48% 10%;
-    --leather: 20 55% 36%;        /* #8D4E2D — vintage leather */
-    --leather-light: 20 45% 55%;  /* lighter leather for hover/tint */
+    --accent: 20 45% 55%;           /* Leather-light for accents */
+    --accent-foreground: 0 0% 100%;
+    
+    --leather: 20 55% 36%;
+    --leather-light: 20 45% 55%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 100 20% 85%;
     --input: 100 20% 85%;
-    --ring: 100 48% 12%;
-    --radius: 0.75rem;
+    --ring: 20 55% 36%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 100 48% 10%;
+    --background: 100 48% 7%;
     --foreground: 83 38% 95%;
-    --card: 100 48% 12%;
+    
+    /* Primary Action Color - Set to Leather-Light for better dark mode visibility */
+    --primary: 20 45% 55%;
+    --primary-foreground: 0 0% 100%; /* Keep text white for contrast */
+    
+    --card: 100 48% 10%;
     --card-foreground: 83 38% 95%;
     --popover: 100 48% 10%;
     --popover-foreground: 83 38% 95%;
-    --primary: 83 38% 74%;
-    --primary-foreground: 100 48% 10%;
     --secondary: 100 30% 18%;
     --secondary-foreground: 83 38% 95%;
     --muted: 100 20% 15%;
     --muted-foreground: 83 20% 65%;
-    --accent: 83 38% 74%;
-    --accent-foreground: 100 48% 10%;
+    --accent: 20 45% 55%;
+    --accent-foreground: 0 0% 100%;
+    
     --leather: 20 55% 42%;
     --leather-light: 20 45% 55%;
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 100 20% 20%;
     --input: 100 20% 20%;
-    --ring: 83 38% 74%;
+    --ring: 20 45% 55%;
   }
 }
 
@@ -61,21 +74,35 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, sans-serif;
   }
-  /* Old Standard TT for all headings and headline-classed elements */
-  h1, h2, h3, h4, h5, h6,
-  .font-headline {
-    font-family: 'Old Standard TT', Georgia, 'Times New Roman', serif;
+  
+  /* Applying Old Standard TT to headings and serif utility */
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: 'Old Standard TT', serif !important;
   }
 }
 
-/* Leather color utilities */
-.text-leather       { color: hsl(var(--leather)); }
-.bg-leather         { background-color: hsl(var(--leather)); }
-.border-leather     { border-color: hsl(var(--leather)); }
-.bg-leather\/10     { background-color: hsl(var(--leather) / 0.10); }
-.bg-leather\/20     { background-color: hsl(var(--leather) / 0.20); }
-.text-leather-light { color: hsl(var(--leather-light)); }
-
-/* Scrollbar hide utility — used in mobile nav */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@layer utilities {
+  .text-leather {
+    color: hsl(var(--leather));
+  }
+  .text-leather-light {
+    color: hsl(var(--leather-light));
+  }
+  .bg-leather {
+    background-color: hsl(var(--leather));
+  }
+  .bg-leather-light {
+    background-color: hsl(var(--leather-light));
+  }
+  .border-leather {
+    border-color: hsl(var(--leather));
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

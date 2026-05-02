@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -10,8 +10,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        // Mapped to the Google Fonts imported in globals.css
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Old Standard TT', 'serif'],
         body: ['Inter', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
+        // Replaced Space Grotesk with Old Standard TT for your headings
+        headline: ['Old Standard TT', 'serif'],
         code: ['monospace'],
       },
       colors: {
@@ -26,8 +30,8 @@ export default {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'hsl(var(--primary))',           /* Now points to Leather */
+          foreground: 'hsl(var(--primary-foreground))', /* Now points to White */
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -38,8 +42,13 @@ export default {
           foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
+          DEFAULT: 'hsl(var(--accent))',            /* Now points to Leather-Light */
           foreground: 'hsl(var(--accent-foreground))',
+        },
+        // Dedicated leather utilities for manual use (e.g., text-leather)
+        leather: {
+          DEFAULT: 'hsl(var(--leather))',
+          light: 'hsl(var(--leather-light))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
@@ -73,20 +82,12 @@ export default {
       },
       keyframes: {
         'accordion-down': {
-          from: {
-            height: '0',
-          },
-          to: {
-            height: 'var(--radix-accordion-content-height)',
-          },
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
-          from: {
-            height: 'var(--radix-accordion-content-height)',
-          },
-          to: {
-            height: '0',
-          },
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
       },
       animation: {

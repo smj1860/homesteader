@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Navigation } from "@/components/Navigation"
 import { useSustainData } from "@/hooks/use-sustain-data"
-import { useCollection } from "@/supabase"
+import { useCollection, useSupabaseClient } from "@/supabase"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -21,11 +21,27 @@ import { subscribeToNewsletter } from "@/app/actions/newsletter"
 export default function Home() {
   const { tier, credits } = useSustainData()
   const { toast } = useToast()
+  const supabase = useSupabaseClient()
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { 
+    setMounted(true) 
+    
+    // Check initial session
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user)
+    })
+
+    // Listen for auth changes to update buttons immediately
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const { data: recentLogs, isLoading: logsLoading } = useCollection('build_logs', {
     filters: { is_public: true },
@@ -69,11 +85,9 @@ export default function Home() {
                 alt="SteadCraft — homesteaders at work"
                 fill
                 className="object-cover opacity-10"
-                data-ai-hint="homestead farm community"
               />
             </div>
             <div className="relative z-10 w-full p-8 md:p-16">
-              {/* Logo — uses actual logo file */}
               <div className="mb-6 h-16 w-16">
                 <Image
                   src="/android-chrome-192x192.png"
@@ -84,13 +98,13 @@ export default function Home() {
                 />
               </div>
 
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-leather-light mb-4">
                 The homestead is our craft.
               </p>
 
               <h1 className="font-headline text-4xl font-bold md:text-5xl lg:text-6xl leading-[1.1] max-w-3xl">
                 Where homesteaders{" "}
-                <span className="text-accent">build, grow,</span>
+                <span className="text-leather">build, grow,</span>
                 <br />and figure it out together.
               </h1>
 
@@ -99,23 +113,45 @@ export default function Home() {
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
-                <Button
-                  size="lg"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full px-8 font-bold"
-                  asChild
-                >
-                  <Link href="/projects">Start a Project</Link>
-                </Button>
-                <Button
-                  size="lg"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full px-8 font-bold"
-                  asChild
-                >
-                  <Link href="/signup">Join the Community</Link>
-                </Button>
+                {user ? (
+                  <>
+                    <Button
+                      size="lg"
+                      className="bg-leather text-white hover:bg-leather/90 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/projects">Start a Project</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-leather text-leather hover:bg-leather/10 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/account">My Account</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      size="lg"
+                      className="bg-leather text-white hover:bg-leather/90 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/create-account">Join the Community</Link>
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-leather text-leather hover:bg-leather/10 rounded-full px-8 font-bold"
+                      asChild
+                    >
+                      <Link href="/login">Sign In</Link>
+                    </Button>
+                  </>
+                )}
               </div>
 
-              {/* Stats strip */}
               <div className="mt-10 flex flex-wrap gap-6 text-sm text-card-foreground/60">
                 <span><strong className="text-card-foreground">11</strong> project categories</span>
                 <span><strong className="text-card-foreground">Free</strong> to get started</span>
@@ -135,34 +171,14 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                step: "01",
-                title: "Pick your project",
-                desc: "Choose from 11 categories covering everything on the homestead — or describe something custom.",
-                color: "bg-primary/10 text-primary",
-              },
-              {
-                step: "02",
-                title: "Get a real guide",
-                desc: "AI builds a step-by-step plan with safety notes, a tool list, and instructions matched to your skill level.",
-                color: "bg-leather\/10 text-leather",
-              },
-              {
-                step: "03",
-                title: "Ask questions as you go",
-                desc: "Stuck on a step? Ask SteadCraft. Get a direct answer in plain language without starting over.",
-                color: "bg-accent/20 text-accent-foreground",
-              },
-              {
-                step: "04",
-                title: "Share what you built",
-                desc: "Log your progress, post photos, and share with a community that appreciates honest work.",
-                color: "bg-primary/10 text-primary",
-              },
+              { step: "01", title: "Pick your project", desc: "Choose from 11 categories covering everything on the homestead — or describe something custom." },
+              { step: "02", title: "Get a real guide", desc: "AI builds a step-by-step plan with safety notes, a tool list, and instructions matched to your skill level." },
+              { step: "03", title: "Ask questions as you go", desc: "Stuck on a step? Ask SteadCraft. Get a direct answer in plain language without starting over." },
+              { step: "04", title: "Share what you built", desc: "Log your progress, post photos, and share with a community that appreciates honest work." },
             ].map((item) => (
               <Card key={item.step} className="bg-card text-card-foreground border-border/40 shadow-sm hover:shadow-md transition-all">
                 <CardContent className="pt-8 pb-6 flex flex-col gap-3">
-                  <span className="font-headline text-4xl font-bold text-leather opacity-40">{item.step}</span>
+                  <span className="font-headline text-4xl font-bold text-leather/40">{item.step}</span>
                   <h3 className="font-headline font-bold text-base text-card-foreground">{item.title}</h3>
                   <p className="text-sm text-card-foreground/70 leading-relaxed">{item.desc}</p>
                 </CardContent>
@@ -175,7 +191,7 @@ export default function Home() {
         <section className="mb-20">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="font-headline text-2xl font-bold text-foreground">Built for every corner of your land</h2>
-            <Link href="/projects" className="text-xs font-bold uppercase text-primary hover:underline tracking-wider">
+            <Link href="/projects" className="text-xs font-bold uppercase text-leather hover:underline tracking-wider">
               View All →
             </Link>
           </div>
@@ -195,9 +211,9 @@ export default function Home() {
               { name: "Self-Sufficiency",   icon: Leaf,      id: "self-sufficiency" },
             ].map((cat) => (
               <Link key={cat.id} href={`/projects?category=${cat.id}`}>
-                <Card className="hover:ring-2 hover:ring-accent transition-all hover:shadow-md h-full bg-card text-card-foreground border-border/40 shadow-sm group">
+                <Card className="hover:ring-2 hover:ring-leather transition-all hover:shadow-md h-full bg-card text-card-foreground border-border/40 shadow-sm group">
                   <CardContent className="flex flex-col items-center justify-center p-5">
-                    <div className="mb-3 rounded-full p-3 bg-primary-foreground/10 text-primary-foreground group-hover:bg-primary-foreground/20 transition-colors">
+                    <div className="mb-3 rounded-full p-3 bg-leather/10 text-leather group-hover:bg-leather/20 transition-colors">
                       <cat.icon className="h-5 w-5" />
                     </div>
                     <span className="font-bold text-[10px] uppercase tracking-widest text-center text-card-foreground leading-tight">{cat.name}</span>
@@ -212,7 +228,7 @@ export default function Home() {
         <section className="mb-16">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="font-headline text-2xl font-bold text-foreground">Community Build Feed</h2>
-            <Link href="/projects" className="text-xs font-bold uppercase text-primary hover:underline tracking-wider">
+            <Link href="/projects" className="text-xs font-bold uppercase text-leather hover:underline tracking-wider">
               View All →
             </Link>
           </div>
@@ -222,7 +238,7 @@ export default function Home() {
             ) : recentLogs?.length ? (
               recentLogs.slice(0, 6).map((log) => (
                 <Link key={log.id} href={`/share/${log.user_id}/${log.project_id}/${log.id}`}>
-                  <Card className="h-full group hover:ring-2 hover:ring-accent transition-all overflow-hidden bg-card border-border/40 shadow-sm text-card-foreground">
+                  <Card className="h-full group hover:ring-2 hover:ring-leather transition-all overflow-hidden bg-card border-border/40 shadow-sm text-card-foreground">
                     {log.photo_url && (
                       <div className="relative h-40 w-full overflow-hidden">
                         <Image src={log.photo_url} alt={log.project_title} fill className="object-cover group-hover:scale-105 transition-transform" />
@@ -240,7 +256,7 @@ export default function Home() {
                       <div className="flex items-center gap-2 text-[10px] text-card-foreground/50">
                         <Users className="h-3 w-3" /> {log.username}
                       </div>
-                      <ArrowRight className="h-4 w-4 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <ArrowRight className="h-4 w-4 text-leather opacity-0 group-hover:opacity-100 transition-opacity" />
                     </CardFooter>
                   </Card>
                 </Link>
@@ -257,9 +273,9 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
             <Link href="/workshop">
-              <Card className="group hover:ring-2 hover:ring-accent transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-                  <div className="rounded-lg bg-primary-foreground/10 p-3 text-primary-foreground">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
                     <PlayCircle className="h-6 w-6" />
                   </div>
                   <div>
@@ -270,9 +286,9 @@ export default function Home() {
               </Card>
             </Link>
             <Link href="/tools">
-              <Card className="group hover:ring-2 hover:ring-accent transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-                  <div className="rounded-lg bg-primary-foreground/10 p-3 text-primary-foreground">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
                     <Star className="h-6 w-6" />
                   </div>
                   <div>
@@ -283,9 +299,9 @@ export default function Home() {
               </Card>
             </Link>
             <Link href="/resources">
-              <Card className="group hover:ring-2 hover:ring-accent transition-all bg-card text-card-foreground border-border/40 shadow-sm">
+              <Card className="group hover:ring-2 hover:ring-leather transition-all bg-card text-card-foreground border-border/40 shadow-sm">
                 <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-                  <div className="rounded-lg bg-primary-foreground/10 p-3 text-primary-foreground">
+                  <div className="rounded-lg bg-leather/10 p-3 text-leather">
                     <BookOpen className="h-6 w-6" />
                   </div>
                   <div>
@@ -298,11 +314,10 @@ export default function Home() {
           </div>
 
           <aside className="space-y-6">
-            {/* Newsletter */}
             <Card className="border-border/40 bg-card text-card-foreground shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 font-headline text-lg text-card-foreground">
-                  <Mail className="h-5 w-5 text-accent" /> Grain & Grit
+                  <Mail className="h-5 w-5 text-leather" /> Grain & Grit
                 </CardTitle>
                 <CardDescription className="text-card-foreground/60">
                   Tips, guides, and seasonal wisdom in your inbox.
@@ -313,7 +328,7 @@ export default function Home() {
                   <Input
                     type="email"
                     placeholder="you@example.com"
-                    className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40"
+                    className="bg-background border-border text-foreground"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -321,7 +336,7 @@ export default function Home() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold uppercase tracking-wider text-xs h-12"
+                    className="w-full bg-leather text-white hover:bg-leather/90 font-bold uppercase tracking-wider text-xs h-12"
                   >
                     {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Subscribe Free"}
                   </Button>
@@ -329,21 +344,6 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Pro tip */}
-            <Card className="border-border/40 bg-card text-card-foreground shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-headline text-sm uppercase tracking-[0.2em] text-accent">
-                  <Lightbulb className="h-4 w-4" /> Pro Tip
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm leading-relaxed text-card-foreground/70 italic">
-                  "When canning tomatoes, adding two tablespoons of lemon juice per quart isn't optional — it's what keeps the pH safe."
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Your status */}
             <Card className="border-border/40 bg-card text-card-foreground shadow-sm">
               <CardHeader>
                 <CardTitle className="font-headline text-lg text-card-foreground">Your Status</CardTitle>
@@ -351,7 +351,7 @@ export default function Home() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-card-foreground/60">Plan</span>
-                  <Badge variant="outline" className="text-accent border-accent/40">
+                  <Badge variant="outline" className="text-leather border-leather/40">
                     {tier === 'paid' ? 'Pro' : 'Free'}
                   </Badge>
                 </div>
@@ -360,12 +360,14 @@ export default function Home() {
                   <span className="font-bold text-card-foreground">{tier === 'paid' ? 'Unlimited' : credits}</span>
                 </div>
                 <Button
-                  className="w-full border-card-foreground/20 hover:bg-card-foreground/10 text-card-foreground"
+                  className="w-full border-leather text-leather hover:bg-leather/10"
                   variant="outline"
                   size="sm"
                   asChild
                 >
-                  <Link href="/account">My Account</Link>
+                   <Link href={user ? "/account" : "/login"}>
+                    {user ? "My Account" : "Sign In to View"}
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
