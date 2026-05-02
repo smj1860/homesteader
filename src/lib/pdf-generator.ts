@@ -336,11 +336,11 @@ export function generateHomesteadPlanHTML(data: HomesteadPlanData): string {
           </tr>
         </thead>
         <tbody>
-          ${data.vegetableYields.map(yield => `
+          ${data.vegetableYields.map(yieldItem => `
             <tr>
-              <td><strong>${yield.name}</strong></td>
-              <td>${yield.yield}</td>
-              <td>${yield.notes}</td>
+              <td><strong>${yieldItem.name}</strong></td>
+              <td>${yieldItem.yield}</td>
+              <td>${yieldItem.notes}</td>
             </tr>
           `).join('')}
         </tbody>

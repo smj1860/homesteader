@@ -242,18 +242,18 @@ export function HomesteadingOutputs({ planData, userId, onBack, onNeedAuth }: Ho
               With {planData.acreage} acres and a family of {planData.familySize}, expect these annual yields:
             </p>
             <div className="space-y-3">
-              {planData.vegetableYields.map((yield) => (
+              {planData.vegetableYields.map((yieldItem) => (
                 <div
-                  key={yield.name}
+                  key={yieldItem.name}
                   className="p-3 rounded border border-border/30 bg-card/50"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <p className="font-semibold text-sm">{yield.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{yield.notes}</p>
+                      <p className="font-semibold text-sm">{yieldItem.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{yieldItem.notes}</p>
                     </div>
                     <Badge variant="outline" className="shrink-0">
-                      {yield.yield}
+                      {yieldItem.yield}
                     </Badge>
                   </div>
                 </div>
