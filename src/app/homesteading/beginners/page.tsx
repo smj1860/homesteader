@@ -212,7 +212,7 @@ export default function BeginnersPage() {
                     <span className="text-lg">✓</span>
                     <div>
                       <p className="font-semibold text-sm">Scalable Soil Mix Recipe</p>
-                      <p className="text-xs text-muted-foreground">Elite 4-3-2-1 formula designed for your garden</p>
+                      <p className="text-xs text-muted-foreground">The Base, Lung, Engine & Filter — a proven 4-part mix built for real results</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
