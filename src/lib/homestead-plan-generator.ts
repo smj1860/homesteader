@@ -156,17 +156,17 @@ function generateSoilMix(): SoilMixRecipe {
         ratio: 1,
       },
     ],
-    description: `This elite soil mix is specifically designed for raised beds and in-ground gardens. The 4-3-2-1 ratio creates the perfect balance of structure, aeration, microbiology, and drainage—critical for Alabama's hot, humid summers.
+    description: `This is our go-to soil mix for raised beds — a proven 4-part formula that creates the perfect balance of structure, aeration, microbiology, and drainage for any climate.
 
-**The Base** (4 parts) provides the primary mineral structure and organic matter foundation.
+**The Base** (4 parts) — Miracle-Gro Performance Organics: provides the primary organic matter foundation and initial nutrient load without harsh synthetic salts.
 
-**The Lung** (3 parts) is essential for long-term aeration and internal drainage. This prevents the bed from becoming a "brick" in the Alabama summer heat.
+**The Lung** (3 parts) — Soil Conditioner: essential for long-term aeration and internal drainage. Keeps the bed loose and workable season after season instead of compacting into a brick.
 
-**The Engine** (2 parts) brings diversified microbiology. The cow manure brings nitrogen-fixing bacteria, while the mushroom compost brings calcium and fungal life.
+**The Engine** (2 parts) — 50/50 Black Kow + Mushroom Compost: the biological fuel of the mix. Black Kow brings nitrogen-fixing bacteria and aged manure; mushroom compost adds calcium, fungal life, and slow-release nutrients.
 
-**The Filter** (1 part) provides immediate drainage and keeps oxygen flowing to the roots—preventing root rot in wet seasons.
+**The Filter** (1 part) — Vigoro Perlite: provides immediate drainage and keeps oxygen flowing to the roots, preventing waterlogging after heavy rain.
 
-This formula scales linearly. For 8 raised beds that are 4'x8'x12", multiply each ratio by 8 and order in bulk to save money.`,
+This formula scales linearly. Multiply each ratio number by the number of beds you're filling and order in bulk to save money.`,
   }
 }
 
