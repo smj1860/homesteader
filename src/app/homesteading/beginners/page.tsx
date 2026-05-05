@@ -59,7 +59,7 @@ export default function BeginnersPage() {
         {/* Hero Section */}
         <section className="mb-12 text-center max-w-3xl mx-auto">
           <div className="mb-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{color:"#264228"}}">
+            <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{color:"#264228"}}>
               Welcome to Your Homesteading Journey
             </h1>
             <p className="text-xl text-muted-foreground">
