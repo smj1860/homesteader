@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { SupabaseProvider } from '@/supabase';
+import { SustainDataProvider } from '@/hooks/sustain-data-provider';
 
 export const metadata: Metadata = {
   title: {
@@ -66,8 +67,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <SupabaseProvider>
-          {children}
-          <Toaster />
+          <SustainDataProvider>
+            {children}
+            <Toaster />
+          </SustainDataProvider>
         </SupabaseProvider>
       </body>
     </html>
