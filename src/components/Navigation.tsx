@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   Home, Package, Users, Wrench, PlayCircle,
-  Star, UserCircle, BookOpen, LogOut, LogIn
+  Star, UserCircle, BookOpen, LogOut, LogIn, Sprout
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { TrialBanner } from "@/components/TrialBanner"
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 const navItems = [
   { name: "Home",       short: "Home",      href: "/",           icon: Home },
   { name: "Projects",   short: "Projects",  href: "/projects",   icon: Wrench },
+  { name: "Homesteading", short: "Homestead", href: "/homesteading", icon: Sprout },
   { name: "Workshop",   short: "Workshop",  href: "/workshop",   icon: PlayCircle },
   { name: "Resources",  short: "Resources", href: "/resources",  icon: BookOpen },
   { name: "Reviews",    short: "Reviews",   href: "/tools",      icon: Star },
