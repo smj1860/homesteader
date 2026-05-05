@@ -204,7 +204,7 @@ export default function SuburbanGardenPage() {
             <ul className="space-y-2 text-sm">
               {[
                 'A baker\'s rack or wire shelf — 2 to 4 tiers',
-                'Full-spectrum LED grow lights on each shelf (affiliate links coming)',
+                'Full-spectrum LED grow lights on each shelf — budget: Barrina 4-Pack T5 1ft ($30), mid: Ultra Thin Panel 5-Pack ($43), larger setup: Barrina TX-L84 4ft 84W ($60)',
                 'Lights 2–4" above seedling trays, raised as plants grow',
                 '16 hours on, 8 hours off — plug into a simple outlet timer',
                 'Seedling heat mat under trays for germination (most seeds want 65–75°F soil)',
