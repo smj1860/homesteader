@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Search, MapPin, Lock, ChevronRight, Archive, Sprout, Scissors, Heart, PawPrint, UtensilsCrossed } from "lucide-react"
+import { Loader2, Search, MapPin, Lock, ChevronRight, Archive, Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, FlaskConical } from "lucide-react"
 import Link from "next/link"
 import { PricingModal } from "@/components/PricingModal"
 import { useSustainData } from "@/hooks/use-sustain-data"
@@ -17,7 +17,7 @@ const FOREST = '#264228'
 const GOLD   = '#A88032'
 
 const CATEGORY_ICONS: Record<string, any> = {
-  Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, Archive,
+  Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, Archive, FlaskConical,
 }
 
 const ZONE_DESCRIPTIONS: Record<number, { label: string; temps: string }> = {
@@ -38,6 +38,7 @@ const RESOURCE_CATEGORIES = [
   { id: "companion",    slug: "companion",    name: "Companion Planting",    icon: "Heart",           description: "What grows well together and what doesn't" },
   { id: "animals",      slug: "animals",      name: "Livestock Feeding",     icon: "PawPrint",        description: "Daily feed amounts for 13 homestead animals" },
   { id: "preservation", slug: "preservation", name: "Preservation",          icon: "UtensilsCrossed", description: "Safe canning times, freezing, and fermentation" },
+  { id: "cleaning-recipes", slug: "cleaning-recipes", name: "Cleaning Recipes",  icon: "FlaskConical",    description: "Tested homemade recipes for laundry, cleaning, and garden use" },
 ]
 
 function ResourcesContent() {
