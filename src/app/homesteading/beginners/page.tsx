@@ -237,7 +237,7 @@ export default function BeginnersPage() {
                       // Navigate to signup with trial offer
                       window.location.href = '/auth/signup?offer=free-trial'
                     }}
-                    className="w-full text-black hover:opacity-90" style={{backgroundColor:"#A88032"}} font-semibold py-6"
+                    className="w-full text-black hover:opacity-90 font-semibold py-6" style={{backgroundColor:"#A88032"}}
                   >
                     Create Free Account
                   </Button>
