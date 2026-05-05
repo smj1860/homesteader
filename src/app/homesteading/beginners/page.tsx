@@ -71,7 +71,7 @@ export default function BeginnersPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             <Card className="border-border/40 bg-card/50">
               <CardContent className="pt-6 flex flex-col items-center text-center">
-                <Sprout className="h-8 w-8 mb-3" style={{color:"#A88032"}}" />
+                <Sprout className="h-8 w-8 mb-3" style={{color:"#A88032"}} />
                 <h3 className="font-semibold text-sm">Personalized Plans</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   Custom recommendations based on your space and climate
@@ -81,7 +81,7 @@ export default function BeginnersPage() {
 
             <Card className="border-border/40 bg-card/50">
               <CardContent className="pt-6 flex flex-col items-center text-center">
-                <Zap className="h-8 w-8 mb-3" style={{color:"#A88032"}}" />
+                <Zap className="h-8 w-8 mb-3" style={{color:"#A88032"}} />
                 <h3 className="font-semibold text-sm">Realistic Yields</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   See what you can actually grow and harvest each year
@@ -91,7 +91,7 @@ export default function BeginnersPage() {
 
             <Card className="border-border/40 bg-card/50">
               <CardContent className="pt-6 flex flex-col items-center text-center">
-                <Leaf className="h-8 w-8 mb-3" style={{color:"#A88032"}}" />
+                <Leaf className="h-8 w-8 mb-3" style={{color:"#A88032"}} />
                 <h3 className="font-semibold text-sm">Expert Guides</h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   Step-by-step instructions to bring your plan to life
@@ -119,7 +119,7 @@ export default function BeginnersPage() {
         {/* Info Section */}
         {step === 'questionnaire' && (
           <section className="mt-16 max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-center" style={{color:"#264228"}}">
+            <h2 className="text-2xl font-bold mb-6 text-center" style={{color:"#264228"}}>
               What You'll Get
             </h2>
 
@@ -199,7 +199,7 @@ export default function BeginnersPage() {
             <Card className="w-full max-w-md">
               <CardContent className="pt-8">
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold mb-2" style={{color:"#264228"}}">
+                  <h2 className="text-2xl font-bold mb-2" style={{color:"#264228"}}>
                     Unlock Your Complete Homestead Plan
                   </h2>
                   <p className="text-muted-foreground">
