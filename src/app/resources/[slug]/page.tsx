@@ -728,6 +728,93 @@ function FreezingSection({ section }: { section: any }) {
   )
 }
 
+
+// ── Recipe renderer ───────────────────────────────────────────────────────────
+function RecipeRenderer({ resource }: { resource: Resource }) {
+  const content = resource.content
+  const recipes: any[] = Array.isArray(content.recipes) ? content.recipes : [content]
+
+  return (
+    <div className="space-y-8">
+      {recipes.map((recipe: any, ri: number) => (
+        <div key={ri} className={ri > 0 ? "pt-6 border-t border-border/30" : ""}>
+          {recipe.name && recipes.length > 1 && (
+            <h3 className="font-headline font-bold text-base text-foreground mb-3">{recipe.name}</h3>
+          )}
+
+          {recipe.intro && (
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{recipe.intro}</p>
+          )}
+
+          {recipe.yield && (
+            <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-4 bg-primary/10 text-primary border border-primary/20">
+              Makes: {recipe.yield}
+            </div>
+          )}
+
+          {/* Ingredients */}
+          {recipe.ingredients && recipe.ingredients.length > 0 && (
+            <div className="mb-5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Ingredients</h4>
+              <ul className="space-y-1.5">
+                {recipe.ingredients.map((ing: any, i: number) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span className="text-muted-foreground">
+                      {ing.amount && <strong className="text-foreground">{ing.amount} </strong>}
+                      {ing.item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Steps */}
+          {recipe.steps && recipe.steps.length > 0 && (
+            <div className="mb-5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Directions</h4>
+              <ol className="space-y-2.5 list-none pl-0">
+                {recipe.steps.map((step: string, i: number) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-primary text-primary-foreground mt-0.5">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm text-muted-foreground leading-relaxed">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Tips */}
+          {recipe.tips && recipe.tips.length > 0 && (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">Tips</p>
+              <ul className="space-y-1">
+                {recipe.tips.map((tip: string, i: number) => (
+                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                    <span className="mt-1 h-1 w-1 rounded-full bg-primary/50 shrink-0" />{tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Caution */}
+          {recipe.caution && (
+            <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+              <p className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
+                <strong>⚠ Caution: </strong>{recipe.caution}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function ResourceCategoryPage() {
   return (
     <Suspense fallback={
