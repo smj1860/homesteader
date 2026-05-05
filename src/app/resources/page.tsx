@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Search, MapPin, Lock, ChevronRight, Archive, Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, FlaskConical } from "lucide-react"
+import { Loader2, Search, MapPin, Lock, ChevronRight, Archive, Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, FlaskConical, Layers, ClipboardList, Hammer } from "lucide-react"
 import Link from "next/link"
 import { PricingModal } from "@/components/PricingModal"
 import { useSustainData } from "@/hooks/use-sustain-data"
@@ -17,7 +17,7 @@ const FOREST = '#264228'
 const GOLD   = '#A88032'
 
 const CATEGORY_ICONS: Record<string, any> = {
-  Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, Archive, FlaskConical,
+  Sprout, Scissors, Heart, PawPrint, UtensilsCrossed, Archive, FlaskConical, Layers, ClipboardList, Hammer,
 }
 
 const ZONE_DESCRIPTIONS: Record<number, { label: string; temps: string }> = {
@@ -32,13 +32,16 @@ const ZONE_DESCRIPTIONS: Record<number, { label: string; temps: string }> = {
 }
 
 const RESOURCE_CATEGORIES = [
-  { id: "planting",     slug: "planting",     name: "Planting Schedules",    icon: "Sprout",          description: "Zone-aware sow and transplant dates for 30 vegetables" },
-  { id: "seed-saving",  slug: "seed-saving",  name: "Seed Saving",           icon: "Archive",         description: "Process and store seeds from 25 common crops" },
-  { id: "pruning",      slug: "pruning",      name: "Pruning & Orchard Care", icon: "Scissors",       description: "When and how to prune every tree and shrub" },
-  { id: "companion",    slug: "companion",    name: "Companion Planting",    icon: "Heart",           description: "What grows well together and what doesn't" },
-  { id: "animals",      slug: "animals",      name: "Livestock Feeding",     icon: "PawPrint",        description: "Daily feed amounts for 13 homestead animals" },
-  { id: "preservation", slug: "preservation", name: "Preservation",          icon: "UtensilsCrossed", description: "Safe canning times, freezing, and fermentation" },
-  { id: "cleaning-recipes", slug: "cleaning-recipes", name: "Cleaning Recipes",  icon: "FlaskConical",    description: "Tested homemade recipes for laundry, cleaning, and garden use" },
+  { id: "planting",         slug: "planting",         name: "Planting Schedules",    icon: "Sprout",          description: "Zone-aware sow and transplant dates for 30 vegetables" },
+  { id: "soil",             slug: "soil",             name: "Soil & Amendments",     icon: "Layers",          description: "Soil mix guides, amendment ratios, and soil health references" },
+  { id: "companion",        slug: "companion",        name: "Companion Planting",    icon: "Heart",           description: "What grows well together and what doesn't" },
+  { id: "seed-saving",      slug: "seed-saving",      name: "Seed Saving",           icon: "Archive",         description: "Process and store seeds from 25 common crops" },
+  { id: "pruning",          slug: "pruning",          name: "Pruning & Orchard Care", icon: "Scissors",       description: "When and how to prune every tree and shrub" },
+  { id: "animals",          slug: "animals",          name: "Livestock & Animal Care", icon: "PawPrint",      description: "Daily feed amounts and care references for homestead animals" },
+  { id: "preservation",     slug: "preservation",     name: "Preservation & Pantry", icon: "UtensilsCrossed", description: "Safe canning times, freezing, and fermentation" },
+  { id: "seasonal",         slug: "seasonal",         name: "Seasonal Checklists",   icon: "ClipboardList",   description: "What to do each season to keep your homestead running smoothly" },
+  { id: "building",         slug: "building",         name: "Building Reference",    icon: "Hammer",          description: "Quick references for coop, shed, and raised bed construction" },
+  { id: "cleaning-recipes", slug: "cleaning-recipes", name: "Cleaning Recipes",      icon: "FlaskConical",    description: "Tested homemade recipes for laundry, cleaning, and garden use" },
 ]
 
 function ResourcesContent() {
