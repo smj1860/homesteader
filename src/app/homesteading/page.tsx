@@ -1,260 +1,320 @@
 'use client'
 
 import { Navigation } from '@/components/Navigation'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { ArrowRight, Sprout, BookOpen, Leaf, Egg, Zap } from 'lucide-react'
+import { ArrowRight, Sprout, BookOpen, Home, Hammer, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import Image from 'next/image'
+
+// Brand tokens — explicit hex so CSS variable resolution never bleeds in
+const FOREST = '#264228'
+const GOLD   = '#A88032'
+const PARCH  = '#F7F3EB'
+const PARCH2 = '#EDE8DE'
 
 export default function HomesteadingHub() {
   return (
-    <div className="min-h-screen bg-background pb-20 pt-20">
+    <div className="min-h-screen pb-20 pt-20" style={{ backgroundColor: PARCH }}>
       <Navigation />
 
-      <main className="container mx-auto px-4">
-        {/* Hero Section */}
-        <section className="mb-16 max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-block mb-4">
-              <Badge className="bg-accent/20 text-accent border-accent/30">🌱 Homesteading Guides</Badge>
+      <main className="container mx-auto px-4 max-w-6xl">
+
+        {/* ── Page Hero ───────────────────────────────────────────────── */}
+        <section
+          className="mb-12 rounded-2xl overflow-hidden relative"
+          style={{ backgroundColor: FOREST }}
+        >
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',
+              backgroundSize: '12px 12px',
+            }}
+          />
+          <div className="relative z-10 px-8 py-14 md:px-16 md:py-20">
+            <div className="mb-6">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
+                style={{ backgroundColor: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}44` }}
+              >
+                <Sprout className="h-3.5 w-3.5" />
+                Homesteading Guides
+              </span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-primary mb-4">
-              Build Your Self-Sufficient Life
+            <h1
+              className="font-serif text-4xl md:text-6xl font-bold leading-tight mb-6 max-w-3xl"
+              style={{ color: PARCH }}
+            >
+              Build Your{' '}
+              <span style={{ color: GOLD }}>Self-Sufficient</span>{' '}
+              Life
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Whether you have a balcony or acres, we'll guide you toward abundant food, cleaner living, and true homestead independence.
+            <p className="text-lg md:text-xl max-w-2xl leading-relaxed mb-10" style={{ color: `${PARCH}cc` }}>
+              Whether you have a balcony or acres, we&apos;ll guide you toward abundant food,
+              cleaner living, and true homestead independence.
             </p>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { label: 'Beginner Series',      href: '/homesteading/beginners/articles' },
+                { label: 'Take the Quiz',         href: '/homesteading/beginners' },
+                { label: 'Suburban Homesteading', href: '/homesteading/suburban' },
+              ].map(({ label, href }) => (
+                <Link key={href} href={href}>
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-80"
+                    style={{ backgroundColor: GOLD, color: '#1a1a1a' }}
+                  >
+                    {label} <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Main CTA Card - Beginners Intro */}
-        <section className="mb-16">
-          <Card className="border-accent/30 overflow-hidden bg-gradient-to-r from-accent/10 to-transparent">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12">
-              <div className="flex flex-col justify-center">
-                <div className="mb-4">
-                  <Badge className="bg-accent text-black mb-4">Start Here</Badge>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-                  Begin Your Homestead
-                </h2>
-                <p className="text-muted-foreground mb-6 text-lg">
-                  Take our personalized quiz and get a custom homestead plan tailored to your space, family size, and climate zone. Includes crop recommendations, soil mix recipes, and realistic yield targets.
-                </p>
-                <Link href="/homesteading/beginners">
-                  <Button size="lg" className="bg-accent hover:bg-accent/90 text-black font-semibold w-fit">
-                    Start the Quiz <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="flex items-center justify-center">
-                <div className="w-full max-w-sm">
-                  <div className="aspect-square bg-accent/20 rounded-2xl border-2 border-accent/30 flex items-center justify-center">
-                    <Sprout className="h-32 w-32 text-accent" />
-                  </div>
-                </div>
+        {/* ── Beginners Quiz CTA ──────────────────────────────────────── */}
+        <section className="mb-12">
+          <div
+            className="rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2"
+            style={{ backgroundColor: PARCH2, border: `1.5px solid ${GOLD}44` }}
+          >
+            <div className="p-8 md:p-12 flex flex-col justify-center">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-4 w-fit"
+                style={{ backgroundColor: `${GOLD}20`, color: GOLD }}
+              >
+                Start Here
+              </span>
+              <h2
+                className="font-serif text-3xl md:text-4xl font-bold mb-4 leading-tight"
+                style={{ color: FOREST }}
+              >
+                Build Your Personalized Homestead Plan
+              </h2>
+              <p className="text-base leading-relaxed mb-6" style={{ color: `${FOREST}bb` }}>
+                Answer a few questions about your space, family size, and climate zone.
+                We&apos;ll generate a custom plan with crop recommendations, soil mix recipes,
+                and realistic yield targets.
+              </p>
+              <ul className="space-y-2 mb-8">
+                {[
+                  'Crops matched to your hardiness zone',
+                  '4-3-2-1 soil mix recipe',
+                  'Coop sizing if you want chickens',
+                  'Printable PDF plan (free account)',
+                ].map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-2.5 text-sm font-medium"
+                    style={{ color: FOREST }}
+                  >
+                    <span style={{ color: GOLD, fontWeight: 700 }}>✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/homesteading/beginners">
+                <button
+                  className="inline-flex items-center gap-2 rounded-lg px-6 py-3 font-bold text-sm transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: FOREST, color: PARCH }}
+                >
+                  Start the Quiz <ArrowRight className="h-4 w-4" />
+                </button>
+              </Link>
+            </div>
+            <div
+              className="hidden md:flex items-center justify-center p-12"
+              style={{ backgroundColor: `${FOREST}10` }}
+            >
+              <div
+                className="w-48 h-48 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${FOREST}18`, border: `2px dashed ${GOLD}44` }}
+              >
+                <Sprout style={{ color: GOLD, width: 80, height: 80, opacity: 0.7 }} />
               </div>
             </div>
-          </Card>
+          </div>
         </section>
 
-        {/* Sections Grid */}
+        {/* ── Guide Cards ─────────────────────────────────────────────── */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold text-primary mb-8 text-center">
+          <h2
+            className="font-serif text-3xl font-bold text-center mb-8"
+            style={{ color: FOREST }}
+          >
             Explore Our Guides
           </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Suburban Homesteading */}
-            <Card className="border-border/40 hover:border-accent/40 transition-colors group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">🏡</span>
-                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/30">
+            <Link href="/homesteading/suburban" className="group block">
+              <div
+                className="rounded-2xl p-7 h-full flex flex-col transition-transform group-hover:-translate-y-1"
+                style={{ backgroundColor: FOREST }}
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${GOLD}22` }}
+                  >
+                    <Home style={{ color: GOLD, width: 24, height: 24 }} />
+                  </div>
+                  <span
+                    className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    style={{ backgroundColor: `${GOLD}22`, color: GOLD }}
+                  >
                     Small Space
-                  </Badge>
+                  </span>
                 </div>
-                <CardTitle>Suburban Homesteading</CardTitle>
-                <CardDescription>
+                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: PARCH }}>
+                  Suburban Homesteading
+                </h3>
+                <p className="text-sm mb-5 flex-1" style={{ color: `${PARCH}99` }}>
                   Maximize your small lot with efficient gardens, container farming, and micro-livestock.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ Raised bed gardening in limited space</p>
-                  <p>✓ Vertical growing techniques</p>
-                  <p>✓ Composting & rainwater collection</p>
-                  <p>✓ Food preservation & storage</p>
-                  <p>✓ Homemade cleaning & personal care</p>
-                </div>
-                <Button variant="ghost" className="w-full justify-between group-hover:text-accent">
-                  Explore <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {[
+                    'Raised bed gardening in limited space',
+                    'Vertical growing techniques',
+                    'Composting & rainwater collection',
+                    'Food preservation & storage',
+                    'Homemade cleaning & personal care',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: `${PARCH}99` }}>
+                      <span style={{ color: GOLD }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: GOLD }}>
+                  Explore guides <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Link>
 
             {/* Beginner Series */}
-            <Card className="border-border/40 hover:border-accent/40 transition-colors group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">📚</span>
-                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
+            <Link href="/homesteading/beginners/articles" className="group block">
+              <div
+                className="rounded-2xl p-7 h-full flex flex-col transition-transform group-hover:-translate-y-1"
+                style={{ backgroundColor: FOREST }}
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${GOLD}22` }}
+                  >
+                    <BookOpen style={{ color: GOLD, width: 24, height: 24 }} />
+                  </div>
+                  <span
+                    className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    style={{ backgroundColor: `${GOLD}22`, color: GOLD }}
+                  >
                     Foundational
-                  </Badge>
+                  </span>
                 </div>
-                <CardTitle>Beginner Series</CardTitle>
-                <CardDescription>
+                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: PARCH }}>
+                  Beginner Series
+                </h3>
+                <p className="text-sm mb-5 flex-1" style={{ color: `${PARCH}99` }}>
                   Core concepts every homesteader should know to get started confidently.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ What homesteading really means</p>
-                  <p>✓ Setting realistic first-year goals</p>
-                  <p>✓ Essential tools & where to start</p>
-                  <p>✓ Common mistakes to avoid</p>
-                  <p>✓ Building community & learning networks</p>
-                </div>
-                <Button variant="ghost" className="w-full justify-between group-hover:text-accent">
-                  Read <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {[
+                    'What homesteading really means',
+                    'Setting realistic first-year goals',
+                    'Essential tools & where to start',
+                    'Common mistakes to avoid',
+                    'Building community & learning networks',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: `${PARCH}99` }}>
+                      <span style={{ color: GOLD }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: GOLD }}>
+                  Read the series <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Link>
 
-            {/* Building Plans */}
-            <Card className="border-border/40 hover:border-accent/40 transition-colors group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">📐</span>
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
-                    DIY
-                  </Badge>
-                </div>
-                <CardTitle>Building Plans</CardTitle>
-                <CardDescription>
-                  Step-by-step plans for coops, sheds, storage, and garden structures.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ Customized to your space</p>
-                  <p>✓ Generated by our AI system</p>
-                  <p>✓ Curated with mockup photos</p>
-                  <p>✓ Tool & material lists included</p>
-                  <p>✓ Difficulty ratings & time estimates</p>
-                </div>
-                <Button variant="ghost" className="w-full justify-between group-hover:text-accent">
-                  Browse <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Tool Resources */}
-            <Card className="border-border/40 hover:border-accent/40 transition-colors group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">🛠️</span>
-                  <Badge variant="outline" className="bg-purple-500/10 text-purple-600 border-purple-500/30">
-                    Equipment
-                  </Badge>
-                </div>
-                <CardTitle>Tools & Resources</CardTitle>
-                <CardDescription>
-                  Curated recommendations for tools, seeds, supplies, and equipment.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ Budget, mid, and premium options</p>
-                  <p>✓ Affiliate reviews & recommendations</p>
-                  <p>✓ Beginner-friendly tool guides</p>
-                  <p>✓ Comparison by category</p>
-                  <p>✓ Where to shop locally vs. online</p>
-                </div>
-                <Button variant="ghost" className="w-full justify-between group-hover:text-accent">
-                  Explore <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Community Projects */}
-            <Card className="border-border/40 hover:border-accent/40 transition-colors group cursor-pointer">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">👥</span>
-                  <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30">
-                    Community
-                  </Badge>
-                </div>
-                <CardTitle>Community Builds</CardTitle>
-                <CardDescription>
-                  Learn from real homesteaders sharing their projects and progress.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ Real user projects & photos</p>
-                  <p>✓ What worked (and what didn't)</p>
-                  <p>✓ Share your own builds</p>
-                  <p>✓ Ask questions & get answers</p>
-                  <p>✓ Celebrate wins together</p>
-                </div>
-                <Button variant="ghost" className="w-full justify-between group-hover:text-accent">
-                  Join <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Coming Soon: Apothecary */}
-            <Card className="border-border/40 opacity-60">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-4xl">🌿</span>
-                  <Badge variant="outline" className="bg-teal-500/10 text-teal-600 border-teal-500/30">
+            {/* Building Plans — coming soon */}
+            <div
+              className="rounded-2xl p-7 h-full flex flex-col relative overflow-hidden"
+              style={{ backgroundColor: FOREST }}
+            >
+              <div
+                className="absolute inset-0 flex items-center justify-center rounded-2xl z-10"
+                style={{ backgroundColor: `${FOREST}e0` }}
+              >
+                <div className="text-center px-6">
+                  <span
+                    className="inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider mb-3"
+                    style={{ backgroundColor: `${GOLD}30`, color: GOLD }}
+                  >
                     Coming Soon
-                  </Badge>
+                  </span>
+                  <p className="text-sm font-semibold" style={{ color: PARCH }}>
+                    Building Plans are in development.
+                  </p>
                 </div>
-                <CardTitle>Apothecary</CardTitle>
-                <CardDescription>
-                  Growing, harvesting, and making natural remedies and tinctures.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>✓ Medicinal herb gardening</p>
-                  <p>✓ Tincture & remedy recipes</p>
-                  <p>✓ Drying & preservation</p>
-                  <p>✓ Safety & dosing</p>
+              </div>
+              <div className="flex items-start justify-between mb-5">
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${GOLD}22` }}
+                >
+                  <Hammer style={{ color: GOLD, width: 24, height: 24 }} />
                 </div>
-                <Button variant="ghost" disabled className="w-full justify-between">
-                  Coming Soon <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                  style={{ backgroundColor: `${GOLD}22`, color: GOLD }}
+                >
+                  DIY
+                </span>
+              </div>
+              <h3 className="font-serif text-xl font-bold mb-2" style={{ color: PARCH }}>
+                Building Plans
+              </h3>
+              <p className="text-sm mb-5 flex-1" style={{ color: `${PARCH}99` }}>
+                Step-by-step plans for coops, sheds, storage, and garden structures.
+              </p>
+              <ul className="space-y-1.5 mb-5">
+                {[
+                  'Customized to your space',
+                  'Generated by our AI system',
+                  'Curated with mockup photos',
+                  'Tool & material lists included',
+                  'Difficulty ratings & time estimates',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-xs" style={{ color: `${PARCH}99` }}>
+                    <span style={{ color: GOLD }}>✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
           </div>
         </section>
 
-        {/* Newsletter CTA */}
-        <section className="mt-16 max-w-3xl mx-auto">
-          <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-transparent">
-            <CardContent className="pt-8 pb-8 text-center">
-              <h3 className="text-2xl font-bold text-primary mb-3">
-                Join Grain & Grit
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Our weekly newsletter for homesteaders. Tips, stories, and resources delivered to your inbox.
-              </p>
-              <Link href="/">
-                <Button className="bg-accent hover:bg-accent/90 text-black font-semibold">
-                  Subscribe to Newsletter
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+        {/* ── Newsletter strip ─────────────────────────────────────────── */}
+        <section
+          className="rounded-2xl px-8 py-10 text-center mb-8"
+          style={{ backgroundColor: `${GOLD}18`, border: `1.5px solid ${GOLD}33` }}
+        >
+          <h2 className="font-serif text-2xl font-bold mb-2" style={{ color: FOREST }}>
+            Grain &amp; Grit Newsletter
+          </h2>
+          <p className="text-sm mb-5 max-w-md mx-auto" style={{ color: `${FOREST}aa` }}>
+            Weekly homesteading knowledge — seasonal projects, growing tips, tool reviews,
+            and stories from people who actually do the work.
+          </p>
+          <Link href="/#newsletter">
+            <button
+              className="inline-flex items-center gap-2 rounded-lg px-6 py-3 font-bold text-sm transition-opacity hover:opacity-90"
+              style={{ backgroundColor: GOLD, color: '#1a1a1a' }}
+            >
+              Subscribe Free <ArrowRight className="h-4 w-4" />
+            </button>
+          </Link>
         </section>
+
       </main>
     </div>
   )
