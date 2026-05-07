@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
-// This layout exists specifically to inject metadata for /homesteading,
-// which is a 'use client' component and therefore cannot export its own metadata.
-// Child routes (e.g. /homesteading/suburban) that need their own metadata
-// should define it in their own layout.tsx or page.tsx.
+// This layout injects metadata for /homesteading, which is a 'use client'
+// component and therefore cannot export its own metadata directly.
+// ⚠️  This file belongs at: src/app/homesteading/layout.tsx
+//     NOT at:               src/app/homesteading/beginners/layout.tsx
 
 export const metadata: Metadata = {
   title:       'Homesteading Guides',
