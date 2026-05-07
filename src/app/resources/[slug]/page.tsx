@@ -8,11 +8,15 @@ import { clampZone } from "@/lib/zone-lookup"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import {
   ArrowLeft, Search, Loader2, ChevronDown, ChevronUp,
-  MapPin, CheckCircle2, Info, AlertTriangle
+  MapPin, CheckCircle2, Info, AlertTriangle, RotateCcw
 } from "lucide-react"
+
+const FOREST  = '#264228'
+const GOLD    = '#A88032'
+const PARCH   = '#F7F3EB'
+const LEATHER = '#7C4B2A'
 
 interface Resource {
   id: string
@@ -34,11 +38,11 @@ function ResourceCategoryContent() {
   const zoneParam    = parseInt(searchParams.get("zone") ?? "6")
   const zone         = clampZone(isNaN(zoneParam) ? 6 : zoneParam)
 
-  const [resources,  setResources]  = useState<Resource[]>([])
-  const [catName,    setCatName]    = useState("")
-  const [loading,    setLoading]    = useState(true)
-  const [search,     setSearch]     = useState("")
-  const [expanded,   setExpanded]   = useState<Record<string, boolean>>({})
+  const [resources, setResources] = useState<Resource[]>([])
+  const [catName,   setCatName]   = useState("")
+  const [loading,   setLoading]   = useState(true)
+  const [search,    setSearch]    = useState("")
+  const [expanded,  setExpanded]  = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const load = async () => {
@@ -57,10 +61,7 @@ function ResourceCategoryContent() {
         .eq("is_active", true)
         .order("sort_order")
       setResources(res ?? [])
-      // Auto-expand first resource
-      if (res && res.length > 0) {
-        setExpanded({ [res[0].id]: true })
-      }
+      if (res && res.length > 0) setExpanded({ [res[0].id]: true })
       setLoading(false)
     }
     load()
@@ -77,7 +78,7 @@ function ResourceCategoryContent() {
   if (loading) return (
     <div className="min-h-screen bg-background flex items-center justify-center pt-20">
       <Navigation />
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <Loader2 className="h-8 w-8 animate-spin" style={{ color: FOREST }} />
     </div>
   )
 
@@ -86,66 +87,98 @@ function ResourceCategoryContent() {
       <Navigation />
       <main className="container mx-auto max-w-5xl px-4 pt-8">
 
-        {/* Breadcrumb / header */}
+        {/* Breadcrumb */}
         <div className="mb-8">
-          <Button variant="ghost" size="sm" className="mb-3 -ml-2" onClick={() => router.push(`/resources?zone=${zone}`)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mb-3 -ml-2"
+            onClick={() => router.push(`/resources?zone=${zone}`)}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" /> Resource Library
           </Button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="font-headline text-2xl font-bold text-foreground">{catName}</h1>
+            <h1
+              className="font-headline text-2xl font-bold"
+              style={{ color: FOREST }}
+            >
+              {catName}
+            </h1>
             {resources.some(r => r.zone_specific) && (
-              <Badge className="bg-primary/15 text-primary border border-primary/30 gap-1 shrink-0">
+              <Badge
+                className="gap-1 shrink-0"
+                style={{
+                  backgroundColor: `${FOREST}15`,
+                  color: FOREST,
+                  border: `1px solid ${FOREST}30`,
+                }}
+              >
                 <MapPin className="h-3 w-3" /> Showing Zone {zone}
               </Badge>
             )}
           </div>
           {resources.some(r => r.zone_specific) && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs mt-1" style={{ color: `${FOREST}70` }}>
               Zone-specific content shown for Zone {zone}.{" "}
               <button
-                onClick={() => router.push(`/resources?zone=${zone}`)}
-                className="text-primary hover:underline underline-offset-2"
+                className="underline hover:no-underline"
+                style={{ color: GOLD }}
+                onClick={() => router.push("/resources")}
               >
-                Change zone →
+                Update zone
               </button>
             </p>
           )}
         </div>
 
         {/* Search */}
-        {resources.length > 1 && (
-          <div className="relative mb-6 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search this section…"
-              className="pl-9 bg-background border-border/40"
+        {resources.length > 2 && (
+          <div className="relative mb-6 max-w-md">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+              style={{ color: `${FOREST}60` }}
+            />
+            <input
+              placeholder="Search within this category…"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg text-sm outline-none"
+              style={{
+                border: `1.5px solid ${FOREST}25`,
+                color: FOREST,
+                backgroundColor: '#ffffff',
+              }}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
             />
           </div>
         )}
 
-        {/* Resources */}
+        {/* Resource accordion cards */}
         <div className="space-y-4">
-          {filtered.map((resource) => (
-            <Card key={resource.id} className="border-border/40 bg-card overflow-hidden">
+          {filtered.map(resource => (
+            <Card key={resource.id} className="border-border/30 overflow-hidden">
               <button
                 className="w-full text-left"
                 onClick={() => toggle(resource.id)}
               >
-                <CardHeader className="pb-3 hover:bg-muted/20 transition-colors">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <CardTitle className="font-headline text-base text-card-foreground">
-                        {resource.title}
-                      </CardTitle>
-                      {resource.description && (
-                        <p className="text-xs text-muted-foreground mt-1">{resource.description}</p>
-                      )}
-                    </div>
+                <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
+                  <div>
+                    <CardTitle
+                      className="font-headline text-lg font-bold mb-1"
+                      style={{ color: 'var(--card-foreground)' }}
+                    >
+                      {resource.title}
+                    </CardTitle>
+                    <p
+                      className="text-xs leading-relaxed"
+                      style={{ color: 'rgba(var(--card-foreground-rgb, 247 243 235) / 0.7)' }}
+                    >
+                      {resource.description}
+                    </p>
+                  </div>
+                  <div className="shrink-0 mt-1">
                     {expanded[resource.id]
-                      ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
-                      : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+                      ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                      : <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     }
                   </div>
                 </CardHeader>
@@ -161,15 +194,31 @@ function ResourceCategoryContent() {
         </div>
 
         {filtered.length === 0 && (
-          <p className="text-center py-12 text-muted-foreground">No results for &ldquo;{search}&rdquo;</p>
+          <p
+            className="text-center py-12 text-sm"
+            style={{ color: `${FOREST}60` }}
+          >
+            No results for &ldquo;{search}&rdquo;
+          </p>
         )}
+
+        {/* Back link */}
+        <div className="mt-10 pt-6" style={{ borderTop: `1px solid ${FOREST}15` }}>
+          <button
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider hover:opacity-70"
+            style={{ color: FOREST }}
+            onClick={() => router.push(`/resources?zone=${zone}`)}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> All Resources
+          </button>
+        </div>
+
       </main>
     </div>
   )
 }
 
-// ── Resource content renderers ────────────────────────────────────────────────
-
+// ── Resource renderer (switch) ─────────────────────────────────────────────────
 function ResourceRenderer({ resource, zone }: { resource: Resource; zone: number }) {
   switch (resource.content_type) {
     case 'table':     return <TableRenderer resource={resource} zone={zone} />
@@ -177,18 +226,36 @@ function ResourceRenderer({ resource, zone }: { resource: Resource; zone: number
     case 'checklist': return <ChecklistRenderer resource={resource} />
     case 'reference': return <ReferenceRenderer resource={resource} />
     case 'recipe':    return <RecipeRenderer resource={resource} />
-    default:          return <pre className="text-xs overflow-auto p-3 rounded-lg bg-gray-50">{JSON.stringify(resource.content, null, 2)}</pre>
+    case 'external':  return (
+      <div className="py-4">
+        <a
+          href={(resource.content as any).path ?? '#'}
+          className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition-all hover:opacity-80"
+          style={{ backgroundColor: FOREST, color: PARCH }}
+        >
+          View full guide →
+        </a>
+      </div>
+    )
+    default: return (
+      <pre
+        className="text-xs overflow-auto rounded-lg p-4"
+        style={{ backgroundColor: `${FOREST}08`, color: FOREST }}
+      >
+        {JSON.stringify(resource.content, null, 2)}
+      </pre>
+    )
   }
 }
 
-// ── Table renderer (with zone-aware switching) ────────────────────────────────
+// ── Table renderer ─────────────────────────────────────────────────────────────
 function TableRenderer({ resource, zone }: { resource: Resource; zone: number }) {
   const content = resource.content
   const [search, setSearch] = useState("")
 
-  // Zone-specific tables have a "zones" key
+  // Zone-specific (planting calendar, etc.)
   if (resource.zone_specific && content.zones) {
-    const zoneKey = String(zone)
+    const zoneKey  = String(zone)
     const zoneData = content.zones[zoneKey] ?? content.zones["6"]
     const rows: string[][] = zoneData?.rows ?? []
     const columns: string[] = content.columns ?? []
@@ -200,38 +267,69 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
       <div>
         {zoneData?.last_frost && (
           <div className="mb-4 flex flex-wrap gap-3">
-            <Badge variant="outline" className="text-xs border-border/40">
+            <span
+              className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+              style={{ backgroundColor: `${FOREST}12`, color: FOREST, border: `1px solid ${FOREST}25` }}
+            >
               Last Frost: <strong className="ml-1">{zoneData.last_frost}</strong>
-            </Badge>
-            <Badge variant="outline" className="text-xs border-border/40">
-              First Frost: <strong className="ml-1">{zoneData.first_frost === "none" ? "Rare/None" : zoneData.first_frost}</strong>
-            </Badge>
+            </span>
+            <span
+              className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+              style={{ backgroundColor: `${FOREST}12`, color: FOREST, border: `1px solid ${FOREST}25` }}
+            >
+              First Frost:{" "}
+              <strong className="ml-1">
+                {zoneData.first_frost === "none" ? "Rare/None" : zoneData.first_frost}
+              </strong>
+            </span>
           </div>
         )}
+
         <div className="relative mb-3 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
+            style={{ color: `${FOREST}60` }}
+          />
+          <input
             placeholder="Filter crops…"
-            className="pl-8 h-8 text-xs bg-background border-border/40"
+            className="w-full pl-8 pr-3 h-8 rounded-lg text-xs outline-none"
+            style={{ border: `1.5px solid ${FOREST}25`, color: FOREST, backgroundColor: '#ffffff' }}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <div className="overflow-x-auto rounded-lg border border-border/30">
+
+        <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${FOREST}20` }}>
           <table className="w-full text-xs">
             <thead>
-              <tr className="bg-muted/50 border-b border-border/30">
+              <tr style={{ backgroundColor: `${FOREST}12`, borderBottom: `1px solid ${FOREST}25` }}>
                 {columns.map((col, i) => (
-                  <th key={i} className="px-3 py-2 text-left font-bold text-foreground whitespace-nowrap">{col}</th>
+                  <th
+                    key={i}
+                    className="px-3 py-2.5 text-left font-bold whitespace-nowrap"
+                    style={{ color: FOREST }}
+                  >
+                    {col}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map((row, ri) => (
-                <tr key={ri} className={ri % 2 === 0 ? bg-background : bg-muted/20}>
+                <tr
+                  key={ri}
+                  style={{
+                    backgroundColor: ri % 2 === 0 ? '#ffffff' : PARCH,
+                    borderBottom: `1px solid ${FOREST}10`,
+                  }}
+                >
                   {row.map((cell, ci) => (
-                    <td key={ci} className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">
-                      {cell === "—" ? <span className="text-muted-foreground/40">—</span> : cell}
+                    <td
+                      key={ci}
+                      className="px-3 py-2 whitespace-nowrap"
+                      style={{ color: ci === 0 ? FOREST : LEATHER }}
+                    >
+                      {cell === "—" ? <span style={{ color: `${FOREST}30` }}>—</span> : cell}
                     </td>
                   ))}
                 </tr>
@@ -239,12 +337,14 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">{filtered.length} crops shown</p>
+        <p className="text-xs mt-2" style={{ color: `${FOREST}60` }}>
+          {filtered.length} crops shown
+        </p>
       </div>
     )
   }
 
-  // Non-zone table
+  // Non-zone table (seed saving, livestock, etc.)
   const rows: (string[] | Record<string, any>)[] = content.rows ?? []
   const columns: string[] = content.columns ?? Object.keys(rows[0] ?? {})
   const filtered = rows.filter((row: any) =>
@@ -257,29 +357,45 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
     <div>
       {rows.length > 8 && (
         <div className="relative mb-3 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
+            style={{ color: `${FOREST}60` }}
+          />
+          <input
             placeholder="Filter…"
-            className="pl-8 h-8 text-xs bg-background border-border/40"
+            className="w-full pl-8 pr-3 h-8 rounded-lg text-xs outline-none"
+            style={{ border: `1.5px solid ${FOREST}25`, color: FOREST, backgroundColor: '#ffffff' }}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
           />
         </div>
       )}
-      <div className="overflow-x-auto rounded-lg border border-border/30">
+      <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${FOREST}20` }}>
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-muted/50 border-b border-border/30">
+            <tr style={{ backgroundColor: `${FOREST}12`, borderBottom: `1px solid ${FOREST}25` }}>
               {columns.map((col, i) => (
-                <th key={i} className="px-3 py-2 text-left font-bold text-foreground">{col}</th>
+                <th key={i} className="px-3 py-2.5 text-left font-bold" style={{ color: FOREST }}>
+                  {col}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {(filtered as any[]).map((row, ri) => (
-              <tr key={ri} className={ri % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+              <tr
+                key={ri}
+                style={{
+                  backgroundColor: ri % 2 === 0 ? '#ffffff' : PARCH,
+                  borderBottom: `1px solid ${FOREST}10`,
+                }}
+              >
                 {(Array.isArray(row) ? row : columns.map(c => row[c])).map((cell: any, ci: number) => (
-                  <td key={ci} className="px-3 py-2 text-muted-foreground border-b border-border/20">
+                  <td
+                    key={ci}
+                    className="px-3 py-2"
+                    style={{ color: ci === 0 ? FOREST : LEATHER }}
+                  >
                     {cell}
                   </td>
                 ))}
@@ -288,14 +404,19 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
           </tbody>
         </table>
       </div>
-      {/* Extra notes/tips if present */}
       {content.storage_tips && (
-        <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <p className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">Storage Tips</p>
+        <div
+          className="mt-4 rounded-lg p-4"
+          style={{ backgroundColor: `${GOLD}10`, border: `1px solid ${GOLD}28` }}
+        >
+          <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: GOLD }}>
+            Storage Tips
+          </p>
           <ul className="space-y-1">
             {content.storage_tips.map((tip: string, i: number) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> {tip}
+              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: LEATHER }}>
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: GOLD }} />
+                {tip}
               </li>
             ))}
           </ul>
@@ -305,12 +426,13 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
   )
 }
 
-// ── Calendar renderer (pruning) ───────────────────────────────────────────────
+// ── Calendar renderer (pruning) ────────────────────────────────────────────────
 const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-const DIFFICULTY_COLOR = {
-  Easy:     "bg-green-500/15 text-green-700 border-green-500/30",
-  Moderate: "bg-amber-500/15 text-amber-700 border-amber-500/30",
-  Difficult:"bg-red-500/15 text-red-700 border-red-500/30",
+
+const DIFFICULTY_STYLE: Record<string, React.CSSProperties> = {
+  Easy:      { backgroundColor: '#22c55e18', color: '#15803d', border: '1px solid #22c55e35' },
+  Moderate:  { backgroundColor: '#f59e0b18', color: '#b45309', border: '1px solid #f59e0b35' },
+  Difficult: { backgroundColor: '#ef444418', color: '#b91c1c', border: '1px solid #ef444435' },
 }
 
 function CalendarRenderer({ resource }: { resource: Resource }) {
@@ -327,20 +449,34 @@ function CalendarRenderer({ resource }: { resource: Resource }) {
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-4">
+        {/* Search */}
         <div className="relative max-w-xs flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input placeholder="Search plants…" className="pl-8 h-8 text-xs bg-background border-border/40"
-            value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
+            style={{ color: `${FOREST}60` }}
+          />
+          <input
+            placeholder="Search plants…"
+            className="w-full pl-8 pr-3 h-8 rounded-lg text-xs outline-none"
+            style={{ border: `1.5px solid ${FOREST}25`, color: FOREST, backgroundColor: '#ffffff' }}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
+        {/* Type filters */}
         <div className="flex gap-1 flex-wrap">
-          <button onClick={() => setFilter("all")}
-            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${filter === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-            All
-          </button>
-          {types.map(t => (
-            <button key={t} onClick={() => setFilter(t)}
-              className={`px-2 py-1 rounded text-xs font-medium transition-colors ${filter === t ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-              {t}
+          {["all", ...types].map(t => (
+            <button
+              key={t}
+              onClick={() => setFilter(t)}
+              className="px-2 py-1 rounded text-xs font-medium transition-all capitalize"
+              style={
+                filter === t
+                  ? { backgroundColor: FOREST, color: PARCH }
+                  : { backgroundColor: `${FOREST}12`, color: `${FOREST}80` }
+              }
+            >
+              {t === "all" ? "All" : t}
             </button>
           ))}
         </div>
@@ -348,70 +484,118 @@ function CalendarRenderer({ resource }: { resource: Resource }) {
 
       <div className="space-y-4">
         {filtered.map((entry: any, i: number) => (
-          <div key={i} className="rounded-xl border border-border/40 bg-background overflow-hidden">
+          <div
+            key={i}
+            className="rounded-xl overflow-hidden"
+            style={{ border: `1px solid ${FOREST}20`, backgroundColor: '#ffffff' }}
+          >
             {/* Header */}
-            <div className="px-4 py-3 bg-muted/30 flex flex-wrap items-center gap-3">
-              <h3 className="font-headline font-bold text-sm text-foreground">{entry.plant}</h3>
-              <Badge variant="outline" className="text-[10px] border-border/40">{entry.type}</Badge>
+            <div
+              className="flex items-start justify-between px-4 py-3"
+              style={{ borderBottom: `1px solid ${FOREST}12` }}
+            >
+              <div>
+                <p className="font-headline font-bold text-sm" style={{ color: FOREST }}>
+                  {entry.plant}
+                </p>
+                <p className="text-xs capitalize" style={{ color: `${FOREST}70` }}>
+                  {entry.type}
+                </p>
+              </div>
               {entry.difficulty && (
-                <Badge variant="outline"
-                  className={`text-[10px] ${DIFFICULTY_COLOR[entry.difficulty as keyof typeof DIFFICULTY_COLOR] ?? ""}`}>
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={DIFFICULTY_STYLE[entry.difficulty] ?? {}}
+                >
                   {entry.difficulty}
-                </Badge>
+                </span>
               )}
             </div>
 
-            {/* Month chart */}
+            {/* Month grid */}
             <div className="px-4 py-3">
               <div className="grid grid-cols-12 gap-0.5 mb-2">
                 {MONTH_NAMES.map((m, mi) => {
-                  const monthNum = mi + 1
-                  const isBest  = entry.best_months?.includes(monthNum)
-                  const isOkay  = entry.okay_months?.includes(monthNum)
-                  const isAvoid = entry.avoid_months?.includes(monthNum)
+                  const isBest  = entry.best?.includes(mi + 1)
+                  const isOkay  = entry.acceptable?.includes(mi + 1)
+                  const isAvoid = entry.avoid?.includes(mi + 1)
                   return (
-                    <div key={m} className="flex flex-col items-center gap-0.5">
-                      <div className={`w-full h-5 rounded-sm text-[8px] font-bold flex items-center justify-center ${
-                        isBest ? "bg-primary text-primary-foreground" :
-                        isOkay ? "bg-primary/30 text-primary" :
-                        isAvoid? "bg-muted/50 text-muted-foreground/40" :
-                                 "bg-border/20 text-muted-foreground/30"
-                      }`}>
+                    <div key={mi} className="flex flex-col items-center gap-0.5">
+                      <div
+                        className="h-6 w-full rounded-sm flex items-center justify-center text-[10px] font-bold"
+                        style={
+                          isBest  ? { backgroundColor: FOREST, color: PARCH } :
+                          isOkay  ? { backgroundColor: `${FOREST}35`, color: FOREST } :
+                          isAvoid ? { backgroundColor: '#00000010', color: '#00000030' } :
+                                    { backgroundColor: '#00000006', color: '#00000018' }
+                        }
+                      >
                         {isBest ? "✓" : isOkay ? "~" : ""}
                       </div>
-                      <span className="text-[8px] text-muted-foreground/60">{m}</span>
+                      <span className="text-[8px]" style={{ color: `${FOREST}60` }}>{m}</span>
                     </div>
                   )
                 })}
               </div>
-              <div className="flex gap-3 text-[10px] text-muted-foreground">
-                <span className="flex items-center gap-1"><span className="inline-block w-3 h-2 rounded-sm bg-primary" /> Best time</span>
-                <span className="flex items-center gap-1"><span className="inline-block w-3 h-2 rounded-sm bg-primary/30" /> Acceptable</span>
-                <span className="flex items-center gap-1"><span className="inline-block w-3 h-2 rounded-sm bg-muted/50" /> Avoid</span>
+              <div className="flex gap-4 text-[10px]" style={{ color: `${FOREST}70` }}>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block w-3 h-2 rounded-sm"
+                    style={{ backgroundColor: FOREST }}
+                  />
+                  Best time
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block w-3 h-2 rounded-sm"
+                    style={{ backgroundColor: `${FOREST}35` }}
+                  />
+                  Acceptable
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block w-3 h-2 rounded-sm"
+                    style={{ backgroundColor: '#00000015' }}
+                  />
+                  Avoid
+                </span>
               </div>
             </div>
 
             {/* Details */}
             <div className="px-4 pb-4 space-y-3">
               {entry.timing_note && (
-                <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <Info className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 text-xs" style={{ color: LEATHER }}>
+                  <Info className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: GOLD }} />
                   <span>{entry.timing_note}</span>
                 </div>
               )}
               {entry.goal && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1">Goal Shape</p>
-                  <p className="text-xs text-muted-foreground">{entry.goal}</p>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-wider mb-1"
+                    style={{ color: GOLD }}
+                  >
+                    Goal Shape
+                  </p>
+                  <p className="text-xs" style={{ color: LEATHER }}>{entry.goal}</p>
                 </div>
               )}
-              {entry.cuts && entry.cuts.length > 0 && (
+              {entry.cuts?.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-foreground mb-1.5">Cuts to Make</p>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-wider mb-1.5"
+                    style={{ color: FOREST }}
+                  >
+                    Cuts to Make
+                  </p>
                   <ul className="space-y-1">
                     {entry.cuts.map((cut: string, ci: number) => (
-                      <li key={ci} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                      <li key={ci} className="flex items-start gap-2 text-xs" style={{ color: LEATHER }}>
+                        <span
+                          className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
+                          style={{ backgroundColor: FOREST }}
+                        />
                         {cut}
                       </li>
                     ))}
@@ -426,11 +610,18 @@ function CalendarRenderer({ resource }: { resource: Resource }) {
   )
 }
 
-// ── Checklist renderer (seasonal) ────────────────────────────────────────────
+// ── Checklist renderer (seasonal) ─────────────────────────────────────────────
+const SEASON_COLORS: Record<string, { activeBg: string; activeText: string }> = {
+  spring: { activeBg: FOREST,    activeText: PARCH },
+  summer: { activeBg: GOLD,      activeText: '#1a1a1a' },
+  fall:   { activeBg: '#8B4513', activeText: PARCH },
+  winter: { activeBg: '#3d5a80', activeText: PARCH },
+}
+
 function ChecklistRenderer({ resource }: { resource: Resource }) {
   const seasons = resource.content.seasons ?? {}
   const [activeSeason, setActiveSeason] = useState(Object.keys(seasons)[0] ?? "spring")
-  const [checked, setChecked] = useState<Record<string, boolean>>({})
+  const [checked,      setChecked]      = useState<Record<string, boolean>>({})
 
   const season = seasons[activeSeason]
   if (!season) return null
@@ -438,99 +629,155 @@ function ChecklistRenderer({ resource }: { resource: Resource }) {
   const toggleTask = (key: string) => setChecked(c => ({ ...c, [key]: !c[key] }))
   const totalTasks = season.sections.reduce((acc: number, s: any) => acc + s.tasks.length, 0)
   const doneCount  = Object.values(checked).filter(Boolean).length
+  const sc         = SEASON_COLORS[activeSeason] ?? SEASON_COLORS.spring
 
   return (
     <div>
       {/* Season tabs */}
-      <div className="flex gap-1 mb-6 flex-wrap">
-        {Object.entries(seasons).map(([key, val]: [string, any]) => (
-          <button
-            key={key}
-            onClick={() => { setActiveSeason(key); setChecked({}) }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors capitalize ${
-              activeSeason === key
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            {key}
-          </button>
-        ))}
+      <div className="flex gap-2 mb-5 flex-wrap">
+        {Object.keys(seasons).map(key => {
+          const c = SEASON_COLORS[key] ?? SEASON_COLORS.spring
+          return (
+            <button
+              key={key}
+              onClick={() => { setActiveSeason(key); setChecked({}) }}
+              className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all capitalize"
+              style={
+                activeSeason === key
+                  ? { backgroundColor: c.activeBg, color: c.activeText }
+                  : { backgroundColor: `${FOREST}15`, color: `${FOREST}80` }
+              }
+            >
+              {key}
+            </button>
+          )
+        })}
       </div>
 
       {/* Progress */}
-      <div className="mb-5 rounded-lg border border-border/40 bg-muted/20 px-4 py-3 flex items-center gap-4">
+      <div
+        className="mb-5 rounded-lg px-4 py-3 flex items-center gap-4"
+        style={{ backgroundColor: `${FOREST}10`, border: `1px solid ${FOREST}20` }}
+      >
         <div className="flex-1">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-medium text-foreground">Progress</span>
-            <span className="text-muted-foreground">{doneCount} / {totalTasks} tasks</span>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-semibold" style={{ color: FOREST }}>Progress</span>
+            <span className="text-xs" style={{ color: `${FOREST}80` }}>
+              {doneCount} / {totalTasks} tasks
+            </span>
           </div>
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-2 rounded-full overflow-hidden"
+            style={{ backgroundColor: `${FOREST}20` }}
+          >
             <div
-              className="h-full bg-primary rounded-full transition-all"
-              style={{ width: `${totalTasks > 0 ? (doneCount / totalTasks) * 100 : 0}%` }}
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${totalTasks > 0 ? (doneCount / totalTasks) * 100 : 0}%`,
+                backgroundColor: GOLD,
+              }}
             />
           </div>
         </div>
-        <Button variant="ghost" size="sm" className="text-xs shrink-0" onClick={() => setChecked({})}>
-          Reset
-        </Button>
+        <button
+          className="flex items-center gap-1.5 text-xs font-semibold shrink-0 transition-opacity hover:opacity-70"
+          style={{ color: `${FOREST}80` }}
+          onClick={() => setChecked({})}
+        >
+          <RotateCcw className="h-3.5 w-3.5" /> Reset
+        </button>
       </div>
 
+      {/* Sections */}
       {season.sections.map((section: any, si: number) => (
         <div key={si} className="mb-6">
-          <h3 className="font-headline font-bold text-sm text-foreground mb-3 flex items-center gap-2">
-            <span className="h-px flex-1 bg-border/40" />
-            {section.title}
-            <span className="h-px flex-1 bg-border/40" />
-          </h3>
-          <ul className="space-y-2">
-            {section.tasks.map((task: string, ti: number) => {
-              const key = `${si}-${ti}`
-              return (
-                <li key={key}>
-                  <button
-                    className="flex items-start gap-3 w-full text-left group"
-                    onClick={() => toggleTask(key)}
+          {/* Full-width divider */}
+          <div className="relative flex items-center mb-3">
+            <div className="flex-1 h-px" style={{ backgroundColor: `${FOREST}25` }} />
+            <span
+              className="mx-4 text-xs font-bold uppercase tracking-widest shrink-0"
+              style={{ color: LEATHER }}
+            >
+              {section.title}
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: `${FOREST}25` }} />
+          </div>
+
+          {/* Task list — parchment background */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{ backgroundColor: PARCH, border: `1.5px solid ${FOREST}18` }}
+          >
+            <ul>
+              {section.tasks.map((task: string, ti: number) => {
+                const key  = `${si}-${ti}`
+                const done = !!checked[key]
+                return (
+                  <li
+                    key={ti}
+                    style={{
+                      borderBottom: ti < section.tasks.length - 1
+                        ? `1px solid ${FOREST}12`
+                        : 'none',
+                    }}
                   >
-                    <div className={`mt-0.5 h-4 w-4 shrink-0 rounded border flex items-center justify-center transition-colors ${
-                      checked[key]
-                        ? "bg-primary border-primary"
-                        : "border-border/60 group-hover:border-primary/50"
-                    }`}>
-                      {checked[key] && <CheckCircle2 className="h-3 w-3 text-primary-foreground fill-current" />}
-                    </div>
-                    <span className={`text-sm transition-colors ${
-                      checked[key] ? "line-through text-muted-foreground/50" : "text-muted-foreground"
-                    }`}>
-                      {task}
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
+                    <button
+                      className="flex items-start gap-3.5 w-full text-left px-5 py-3.5 transition-colors"
+                      style={{ backgroundColor: done ? `${FOREST}08` : 'transparent' }}
+                      onClick={() => toggleTask(key)}
+                    >
+                      <div
+                        className="shrink-0 rounded flex items-center justify-center transition-all mt-0.5"
+                        style={{
+                          minWidth: '18px',
+                          minHeight: '18px',
+                          backgroundColor: done ? FOREST : 'transparent',
+                          border: `2px solid ${done ? FOREST : `${FOREST}40`}`,
+                        }}
+                      >
+                        {done && (
+                          <CheckCircle2 className="h-3 w-3" style={{ color: PARCH }} />
+                        )}
+                      </div>
+                      <span
+                        className="text-sm leading-relaxed transition-all"
+                        style={{
+                          color: done ? `${FOREST}50` : FOREST,
+                          textDecoration: done ? 'line-through' : 'none',
+                        }}
+                      >
+                        {task}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
         </div>
       ))}
     </div>
   )
 }
 
-// ── Reference renderer (soil, building, canning) ──────────────────────────────
+// ── Reference renderer ─────────────────────────────────────────────────────────
 function ReferenceRenderer({ resource }: { resource: Resource }) {
   const content = resource.content
 
-  // Canning reference has special structure
+  // Preservation / canning
   if (content.warning) {
     return (
       <div className="space-y-6">
-        <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
-          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-800 dark:text-amber-400">{content.warning}</p>
+        <div
+          className="flex items-start gap-2 rounded-lg p-3"
+          style={{ backgroundColor: '#f59e0b15', border: '1px solid #f59e0b40' }}
+        >
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#b45309' }} />
+          <p className="text-xs" style={{ color: '#92400e' }}>{content.warning}</p>
         </div>
-        {content.water_bath && <CanningSection section={content.water_bath} />}
+        {content.water_bath      && <CanningSection section={content.water_bath} />}
         {content.pressure_canning && <CanningSection section={content.pressure_canning} />}
-        {content.freezing_guide && <FreezingSection section={content.freezing_guide} />}
+        {content.freezing_guide  && <FreezingSection section={content.freezing_guide} />}
       </div>
     )
   }
@@ -539,19 +786,38 @@ function ReferenceRenderer({ resource }: { resource: Resource }) {
   if (content.lumber) {
     return (
       <div className="space-y-8">
-        {content.lumber && <RefSection title={content.lumber.title} note={content.lumber.note}
-          columns={["Nominal Size", "Actual Size"]}
-          rows={content.lumber.rows.map((r: any) => [r.nominal, r.actual])} />}
-        {content.concrete && <RefSection title={content.concrete.title} note={content.concrete.coverage}
-          columns={["Use","Mix Ratio","PSI","Notes"]}
-          rows={content.concrete.rows.map((r: any) => [r.use, r.mix, r.psi, r.notes])} />}
+        {content.lumber && (
+          <RefSection
+            title={content.lumber.title}
+            note={content.lumber.note}
+            columns={["Nominal Size", "Actual Size"]}
+            rows={content.lumber.rows.map((r: any) => [r.nominal, r.actual])}
+          />
+        )}
+        {content.concrete && (
+          <RefSection
+            title={content.concrete.title}
+            note={content.concrete.coverage}
+            columns={["Use", "Mix Ratio", "PSI", "Notes"]}
+            rows={content.concrete.rows.map((r: any) => [r.use, r.mix, r.psi, r.notes])}
+          />
+        )}
         {content.post_depth && <PostDepthSection section={content.post_depth} />}
-        {content.wire_gauge && <RefSection title={content.wire_gauge.title} note={content.wire_gauge.note}
-          columns={["Gauge","Max Amps","Breaker","Common Uses","Cable Color"]}
-          rows={content.wire_gauge.rows.map((r: any) => [r.gauge, r.amps, r.breaker, r.uses, r.wire_color])} />}
-        {content.fasteners && <RefSection title={content.fasteners.title}
-          columns={["Application","Fastener","Notes"]}
-          rows={content.fasteners.rows.map((r: any) => [r.use, r.fastener, r.notes])} />}
+        {content.wire_gauge && (
+          <RefSection
+            title={content.wire_gauge.title}
+            note={content.wire_gauge.note}
+            columns={["Gauge", "Max Amps", "Breaker", "Common Uses", "Cable Color"]}
+            rows={content.wire_gauge.rows.map((r: any) => [r.gauge, r.amps, r.breaker, r.uses, r.wire_color])}
+          />
+        )}
+        {content.fasteners && (
+          <RefSection
+            title={content.fasteners.title}
+            columns={["Application", "Fastener", "Notes"]}
+            rows={content.fasteners.rows.map((r: any) => [r.use, r.fastener, r.notes])}
+          />
+        )}
       </div>
     )
   }
@@ -561,60 +827,80 @@ function ReferenceRenderer({ resource }: { resource: Resource }) {
     return (
       <div className="space-y-6">
         {content.ph_guide && (
-          <div className="rounded-xl border border-border/40 bg-background p-4">
-            <h3 className="font-headline font-bold text-sm text-foreground mb-3">{content.ph_guide.title}</h3>
-            <div className="grid grid-cols-2 gap-1 mb-4">
+          <div
+            className="rounded-xl p-4"
+            style={{ backgroundColor: '#ffffff', border: `1px solid ${FOREST}20` }}
+          >
+            <h3
+              className="font-headline font-bold text-sm mb-3"
+              style={{ color: FOREST }}
+            >
+              {content.ph_guide.title}
+            </h3>
+            <div className="grid grid-cols-2 gap-1 mb-2">
               {content.ph_guide.ideal_ranges.map((r: any, i: number) => (
-                <div key={i} className="flex items-center justify-between text-xs bg-muted/30 rounded px-2 py-1">
-                  <span className="text-muted-foreground">{r.crop}</span>
-                  <span className="font-bold text-foreground">{r.ph}</span>
+                <div
+                  key={i}
+                  className="flex items-center justify-between text-xs rounded px-2 py-1"
+                  style={{ backgroundColor: `${FOREST}08` }}
+                >
+                  <span style={{ color: LEATHER }}>{r.crop}</span>
+                  <span className="font-bold" style={{ color: FOREST }}>{r.ph}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
         {content.deficiencies.map((def: any, i: number) => (
-          <div key={i} className="rounded-xl border border-border/40 bg-background overflow-hidden">
-            <div className="px-4 py-3 bg-muted/30">
-              <h3 className="font-headline font-bold text-sm text-foreground">{def.nutrient}</h3>
+          <div
+            key={i}
+            className="rounded-xl overflow-hidden"
+            style={{ border: `1px solid ${FOREST}20`, backgroundColor: '#ffffff' }}
+          >
+            <div className="px-4 py-3" style={{ backgroundColor: `${FOREST}10` }}>
+              <h3 className="font-headline font-bold text-sm" style={{ color: FOREST }}>
+                {def.nutrient}
+              </h3>
             </div>
             <div className="px-4 py-3 space-y-3">
               <div>
-                <p className="text-[10px] font-bold uppercase text-destructive/70 mb-1">Visual Symptoms</p>
+                <p
+                  className="text-[10px] font-bold uppercase mb-1"
+                  style={{ color: '#b91c1c' }}
+                >
+                  Visual Symptoms
+                </p>
                 <ul className="space-y-0.5">
                   {def.symptoms.map((s: string, si: number) => (
-                    <li key={si} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                      <span className="mt-1.5 h-1 w-1 rounded-full bg-destructive/50 shrink-0" />{s}
-                    </li>
+                    <li key={si} className="text-xs" style={{ color: LEATHER }}>• {s}</li>
                   ))}
                 </ul>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {def.causes && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-amber-600 mb-1">Quick Fixes</p>
+                  <p
+                    className="text-[10px] font-bold uppercase mb-1"
+                    style={{ color: GOLD }}
+                  >
+                    Common Causes
+                  </p>
                   <ul className="space-y-0.5">
-                    {def.quick_fixes.map((f: string, fi: number) => (
-                      <li key={fi} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                        <span className="mt-1.5 h-1 w-1 rounded-full bg-amber-500/50 shrink-0" />{f}
-                      </li>
+                    {def.causes.map((c: string, ci: number) => (
+                      <li key={ci} className="text-xs" style={{ color: LEATHER }}>• {c}</li>
                     ))}
                   </ul>
                 </div>
+              )}
+              {def.fix && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-primary/70 mb-1">Long Term</p>
-                  <ul className="space-y-0.5">
-                    {def.long_term_fixes.map((f: string, fi: number) => (
-                      <li key={fi} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                        <span className="mt-1.5 h-1 w-1 rounded-full bg-primary/50 shrink-0" />{f}
-                      </li>
-                    ))}
-                  </ul>
+                  <p
+                    className="text-[10px] font-bold uppercase mb-1"
+                    style={{ color: FOREST }}
+                  >
+                    Fix
+                  </p>
+                  <p className="text-xs" style={{ color: LEATHER }}>{def.fix}</p>
                 </div>
-              </div>
-              {def.soil_test_target && (
-                <p className="text-[10px] text-muted-foreground border-t border-border/30 pt-2">
-                  <strong>Target:</strong> {def.soil_test_target}
-                </p>
               )}
             </div>
           </div>
@@ -623,26 +909,61 @@ function ReferenceRenderer({ resource }: { resource: Resource }) {
     )
   }
 
-  return <pre className="text-xs overflow-auto">{JSON.stringify(content, null, 2)}</pre>
+  return (
+    <pre className="text-xs overflow-auto rounded-lg p-4" style={{ backgroundColor: `${FOREST}08`, color: FOREST }}>
+      {JSON.stringify(content, null, 2)}
+    </pre>
+  )
 }
 
-function RefSection({ title, note, columns, rows }: { title: string; note?: string; columns: string[]; rows: any[][] }) {
+// ── Sub-renderers ──────────────────────────────────────────────────────────────
+function RefSection({
+  title,
+  note,
+  columns,
+  rows,
+}: {
+  title: string
+  note?: string
+  columns: string[]
+  rows: string[][]
+}) {
   return (
     <div>
-      <h3 className="font-headline font-bold text-sm text-foreground mb-1">{title}</h3>
-      {note && <p className="text-xs text-muted-foreground mb-2">{note}</p>}
-      <div className="overflow-x-auto rounded-lg border border-border/30">
+      <h3 className="font-headline font-bold text-sm mb-1" style={{ color: FOREST }}>
+        {title}
+      </h3>
+      {note && (
+        <p className="text-xs mb-3 leading-relaxed" style={{ color: LEATHER }}>{note}</p>
+      )}
+      <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${FOREST}20` }}>
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-muted/50 border-b border-border/30">
-              {columns.map((c, i) => <th key={i} className="px-3 py-2 text-left font-bold text-foreground whitespace-nowrap">{c}</th>)}
+            <tr style={{ backgroundColor: `${FOREST}12`, borderBottom: `1px solid ${FOREST}25` }}>
+              {columns.map((col, i) => (
+                <th key={i} className="px-3 py-2.5 text-left font-bold" style={{ color: FOREST }}>
+                  {col}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((row, ri) => (
-              <tr key={ri} className={ri % 2 === 0 ? bg-background : bg-muted/20}>
-                {row.map((cell, ci) => (
-                  <td key={ci} className="px-3 py-2 text-muted-foreground border-b border-border/20">{cell}</td>
+              <tr
+                key={ri}
+                style={{
+                  backgroundColor: ri % 2 === 0 ? '#ffffff' : PARCH,
+                  borderBottom: `1px solid ${FOREST}10`,
+                }}
+              >
+                {row.map((cell: any, ci: number) => (
+                  <td
+                    key={ci}
+                    className="px-3 py-2"
+                    style={{ color: ci === 0 ? FOREST : LEATHER }}
+                  >
+                    {cell}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -656,13 +977,21 @@ function RefSection({ title, note, columns, rows }: { title: string; note?: stri
 function PostDepthSection({ section }: { section: any }) {
   return (
     <div>
-      <h3 className="font-headline font-bold text-sm text-foreground mb-1">{section.title}</h3>
-      <p className="text-xs text-muted-foreground mb-3">{section.rule}</p>
+      <h3 className="font-headline font-bold text-sm mb-1" style={{ color: FOREST }}>
+        {section.title}
+      </h3>
+      <p className="text-xs mb-3" style={{ color: LEATHER }}>{section.rule}</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <RefSection title="Frost Lines by Region" columns={["Region","Frost Depth"]}
-          rows={section.frost_lines.map((r: any) => [r.region, r.frost_depth])} />
-        <RefSection title="Post Size by Fence Height" columns={["Fence Height","Post Length","Burial Depth"]}
-          rows={section.rows.map((r: any) => [r.post_height, r.post_length, r.burial])} />
+        <RefSection
+          title="Frost Lines by Region"
+          columns={["Region", "Frost Depth"]}
+          rows={section.frost_lines.map((r: any) => [r.region, r.frost_depth])}
+        />
+        <RefSection
+          title="Post Size by Fence Height"
+          columns={["Fence Height", "Post Length", "Burial Depth"]}
+          rows={section.rows.map((r: any) => [r.post_height, r.post_length, r.burial])}
+        />
       </div>
     </div>
   )
@@ -671,27 +1000,50 @@ function PostDepthSection({ section }: { section: any }) {
 function CanningSection({ section }: { section: any }) {
   return (
     <div>
-      <h3 className="font-headline font-bold text-sm text-foreground mb-1">{section.title}</h3>
-      {section.suitable_for && <p className="text-xs text-primary mb-1"><strong>Suitable for:</strong> {section.suitable_for}</p>}
-      {section.not_suitable_for && <p className="text-xs text-destructive/70 mb-1"><strong>NOT suitable for:</strong> {section.not_suitable_for}</p>}
-      {section.pressure_by_type && <p className="text-xs text-muted-foreground mb-2">{section.pressure_by_type}</p>}
-      <div className="overflow-x-auto rounded-lg border border-border/30">
+      <h3 className="font-headline font-bold text-sm mb-1" style={{ color: FOREST }}>
+        {section.title}
+      </h3>
+      {section.suitable_for && (
+        <p className="text-xs mb-1">
+          <strong style={{ color: FOREST }}>Suitable for:</strong>{" "}
+          <span style={{ color: LEATHER }}>{section.suitable_for}</span>
+        </p>
+      )}
+      {section.not_suitable_for && (
+        <p className="text-xs mb-1">
+          <strong style={{ color: '#b91c1c' }}>NOT suitable for:</strong>{" "}
+          <span style={{ color: LEATHER }}>{section.not_suitable_for}</span>
+        </p>
+      )}
+      {section.pressure_by_type && (
+        <p className="text-xs mb-3" style={{ color: LEATHER }}>{section.pressure_by_type}</p>
+      )}
+      <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${FOREST}20` }}>
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-muted/50 border-b border-border/30">
-              <th className="px-3 py-2 text-left font-bold">Food</th>
-              <th className="px-3 py-2 text-left font-bold">Jar Size</th>
-              <th className="px-3 py-2 text-left font-bold">Time</th>
-              <th className="px-3 py-2 text-left font-bold">Notes</th>
+            <tr style={{ backgroundColor: `${FOREST}12`, borderBottom: `1px solid ${FOREST}25` }}>
+              {["Food", "Jar Size", "Time", "Notes"].map(h => (
+                <th key={h} className="px-3 py-2.5 text-left font-bold" style={{ color: FOREST }}>
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {section.items.map((item: any, i: number) => (
-              <tr key={i} className={i % 2 === 0 ? bg-background : bg-muted/20}>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">{item.food}</td>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.jar_size}</td>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">{item.time_minutes} min</td>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.notes}</td>
+              <tr
+                key={i}
+                style={{
+                  backgroundColor: i % 2 === 0 ? '#ffffff' : PARCH,
+                  borderBottom: `1px solid ${FOREST}10`,
+                }}
+              >
+                <td className="px-3 py-2 whitespace-nowrap" style={{ color: FOREST }}>{item.food}</td>
+                <td className="px-3 py-2" style={{ color: LEATHER }}>{item.jar_size}</td>
+                <td className="px-3 py-2 whitespace-nowrap font-semibold" style={{ color: FOREST }}>
+                  {item.time_minutes} min
+                </td>
+                <td className="px-3 py-2 leading-relaxed" style={{ color: LEATHER }}>{item.notes}</td>
               </tr>
             ))}
           </tbody>
@@ -704,22 +1056,38 @@ function CanningSection({ section }: { section: any }) {
 function FreezingSection({ section }: { section: any }) {
   return (
     <div>
-      <h3 className="font-headline font-bold text-sm text-foreground mb-2">{section.title}</h3>
-      <div className="overflow-x-auto rounded-lg border border-border/30">
+      <h3 className="font-headline font-bold text-sm mb-2" style={{ color: FOREST }}>
+        {section.title}
+      </h3>
+      <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${FOREST}20` }}>
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-muted/50 border-b border-border/30">
-              <th className="px-3 py-2 text-left font-bold">Food</th>
-              <th className="px-3 py-2 text-left font-bold">Blanch Time</th>
-              <th className="px-3 py-2 text-left font-bold">Storage</th>
+            <tr style={{ backgroundColor: `${FOREST}12`, borderBottom: `1px solid ${FOREST}25` }}>
+              {["Food", "Blanch Time", "Freezer Storage"].map(h => (
+                <th key={h} className="px-3 py-2.5 text-left font-bold" style={{ color: FOREST }}>
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {section.items.map((item: any, i: number) => (
-              <tr key={i} className={i % 2 === 0 ? bg-background : bg-muted/20}>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.food}</td>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{typeof item.blanch_minutes === "number" ? `${item.blanch_minutes} min` : item.blanch_minutes}</td>
-                <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.storage_months} months</td>
+              <tr
+                key={i}
+                style={{
+                  backgroundColor: i % 2 === 0 ? '#ffffff' : PARCH,
+                  borderBottom: `1px solid ${FOREST}10`,
+                }}
+              >
+                <td className="px-3 py-2" style={{ color: FOREST }}>{item.food}</td>
+                <td className="px-3 py-2" style={{ color: LEATHER }}>
+                  {typeof item.blanch_minutes === "number"
+                    ? `${item.blanch_minutes} min`
+                    : item.blanch_minutes}
+                </td>
+                <td className="px-3 py-2 font-semibold" style={{ color: FOREST }}>
+                  {item.storage_months} months
+                </td>
               </tr>
             ))}
           </tbody>
@@ -729,8 +1097,7 @@ function FreezingSection({ section }: { section: any }) {
   )
 }
 
-
-// ── Recipe renderer ───────────────────────────────────────────────────────────
+// ── Recipe renderer ────────────────────────────────────────────────────────────
 function RecipeRenderer({ resource }: { resource: Resource }) {
   const content = resource.content
   const recipes: any[] = Array.isArray(content.recipes) ? content.recipes : [content]
@@ -738,31 +1105,46 @@ function RecipeRenderer({ resource }: { resource: Resource }) {
   return (
     <div className="space-y-8">
       {recipes.map((recipe: any, ri: number) => (
-        <div key={ri} className={ri > 0 ? "pt-6 border-t border-border/30" : ""}>
+        <div
+          key={ri}
+          className={ri > 0 ? "pt-6" : ""}
+          style={ri > 0 ? { borderTop: `1px solid ${FOREST}20` } : {}}
+        >
           {recipe.name && recipes.length > 1 && (
-            <h3 className="font-headline font-bold text-base text-foreground mb-3">{recipe.name}</h3>
+            <h3 className="font-headline font-bold text-base mb-3" style={{ color: FOREST }}>
+              {recipe.name}
+            </h3>
           )}
 
           {recipe.intro && (
-            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{recipe.intro}</p>
+            <p className="text-sm mb-4 leading-relaxed" style={{ color: LEATHER }}>
+              {recipe.intro}
+            </p>
           )}
 
           {recipe.yield && (
-            <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-4 bg-primary/10 text-primary border border-primary/20">
+            <div
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold mb-4"
+              style={{ backgroundColor: `${FOREST}10`, color: FOREST, border: `1px solid ${FOREST}25` }}
+            >
               Makes: {recipe.yield}
             </div>
           )}
 
-          {/* Ingredients */}
-          {recipe.ingredients && recipe.ingredients.length > 0 && (
+          {recipe.ingredients?.length > 0 && (
             <div className="mb-5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Ingredients</h4>
+              <h4
+                className="text-xs font-bold uppercase tracking-wider mb-2"
+                style={{ color: `${FOREST}80` }}
+              >
+                Ingredients
+              </h4>
               <ul className="space-y-1.5">
                 {recipe.ingredients.map((ing: any, i: number) => (
                   <li key={i} className="flex items-start gap-2.5 text-sm">
-                    <span className="text-primary font-bold shrink-0">✓</span>
-                    <span className="text-muted-foreground">
-                      {ing.amount && <strong className="text-foreground">{ing.amount} </strong>}
+                    <span className="font-bold shrink-0" style={{ color: GOLD }}>✓</span>
+                    <span style={{ color: FOREST }}>
+                      {ing.amount && <strong>{ing.amount} </strong>}
                       {ing.item}
                     </span>
                   </li>
@@ -771,43 +1153,48 @@ function RecipeRenderer({ resource }: { resource: Resource }) {
             </div>
           )}
 
-          {/* Steps */}
-          {recipe.steps && recipe.steps.length > 0 && (
+          {recipe.steps?.length > 0 && (
             <div className="mb-5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Directions</h4>
+              <h4
+                className="text-xs font-bold uppercase tracking-wider mb-2"
+                style={{ color: `${FOREST}80` }}
+              >
+                Directions
+              </h4>
               <ol className="space-y-2.5 list-none pl-0">
                 {recipe.steps.map((step: string, i: number) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-primary text-primary-foreground mt-0.5">
+                    <span
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5"
+                      style={{ backgroundColor: FOREST, color: PARCH }}
+                    >
                       {i + 1}
                     </span>
-                    <span className="text-sm text-muted-foreground leading-relaxed">{step}</span>
+                    <span className="text-sm leading-relaxed" style={{ color: FOREST }}>
+                      {step}
+                    </span>
                   </li>
                 ))}
               </ol>
             </div>
           )}
 
-          {/* Tips */}
-          {recipe.tips && recipe.tips.length > 0 && (
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-primary mb-2">Tips</p>
-              <ul className="space-y-1">
-                {recipe.tips.map((tip: string, i: number) => (
-                  <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-                    <span className="mt-1 h-1 w-1 rounded-full bg-primary/50 shrink-0" />{tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Caution */}
-          {recipe.caution && (
-            <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
-              <p className="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
-                <strong>⚠ Caution: </strong>{recipe.caution}
+          {recipe.tips?.length > 0 && (
+            <div
+              className="rounded-lg p-4 space-y-1.5"
+              style={{ backgroundColor: `${GOLD}10`, border: `1px solid ${GOLD}28` }}
+            >
+              <p
+                className="text-xs font-bold uppercase tracking-wider mb-2"
+                style={{ color: GOLD }}
+              >
+                Tips
               </p>
+              {recipe.tips.map((tip: string, i: number) => (
+                <p key={i} className="text-xs leading-relaxed" style={{ color: LEATHER }}>
+                  • {tip}
+                </p>
+              ))}
             </div>
           )}
         </div>
@@ -816,11 +1203,13 @@ function RecipeRenderer({ resource }: { resource: Resource }) {
   )
 }
 
-export default function ResourceCategoryPage() {
+// ── Page export ────────────────────────────────────────────────────────────────
+export default function ResourceSlugPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-background flex items-center justify-center pt-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Navigation />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: FOREST }} />
       </div>
     }>
       <ResourceCategoryContent />
