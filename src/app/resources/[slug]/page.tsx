@@ -640,7 +640,7 @@ function RefSection({ title, note, columns, rows }: { title: string; note?: stri
           </thead>
           <tbody>
             {rows.map((row, ri) => (
-              <tr key={ri} className={ri % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+              <tr key={ri} className={ri % 2 === 0 ? bg-background : bg-muted/20}>
                 {row.map((cell, ci) => (
                   <td key={ci} className="px-3 py-2 text-muted-foreground border-b border-border/20">{cell}</td>
                 ))}
@@ -687,7 +687,7 @@ function CanningSection({ section }: { section: any }) {
           </thead>
           <tbody>
             {section.items.map((item: any, i: number) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+              <tr key={i} className={i % 2 === 0 ? bg-background : bg-muted/20}>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">{item.food}</td>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.jar_size}</td>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">{item.time_minutes} min</td>
@@ -716,7 +716,7 @@ function FreezingSection({ section }: { section: any }) {
           </thead>
           <tbody>
             {section.items.map((item: any, i: number) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+              <tr key={i} className={i % 2 === 0 ? bg-background : bg-muted/20}>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.food}</td>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{typeof item.blanch_minutes === "number" ? `${item.blanch_minutes} min` : item.blanch_minutes}</td>
                 <td className="px-3 py-2 text-muted-foreground border-b border-border/20">{item.storage_months} months</td>
