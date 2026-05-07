@@ -15,12 +15,6 @@ export const metadata: Metadata = {
     'homesteading', 'DIY', 'project guides', 'homestead',
     'self-sufficiency', 'farming', 'building', 'repair', 'AI assistant',
   ],
-  verification: {
-    other: {
-      'impact-site-verification': '<meta name='impact-site-verification' value='b53b5ac8-dd93-444a-b130-4c208e3d4bf8'>',
-    },
-  },
-}
   authors: [{ name: 'SteadCraft' }],
   creator: 'SteadCraft',
   metadataBase: new URL('https://thesteadcraft.com'),
