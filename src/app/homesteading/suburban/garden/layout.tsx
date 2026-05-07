@@ -1,31 +1,19 @@
 import type { Metadata } from 'next';
 
-// This layout exists specifically to inject metadata for /homesteading,
-// which is a 'use client' component and therefore cannot export its own metadata.
-// Child routes (e.g. /homesteading/suburban) that need their own metadata
-// should define it in their own layout.tsx or page.tsx.
+// ⚠️  This file belongs at: src/app/homesteading/suburban/garden/layout.tsx
 
 export const metadata: Metadata = {
-  title:       'Homesteading Guides',
+  title:       'The Suburban Garden',
   description:
-    'Complete homesteading guides for every skill level — from suburban balcony gardens to off-grid acreage. Grow food, build soil, preserve the harvest, and live more self-sufficiently.',
+    'Raised beds, vertical growing, small-space containers, and seed starting — how to grow more food than you think your suburban yard allows.',
   openGraph: {
-    title:       'Homesteading Guides | SteadCraft',
+    title:       'The Suburban Garden | SteadCraft',
     description:
-      'Complete homesteading guides for every skill level. Grow food, build soil, and live more self-sufficiently — wherever you are.',
-    url:         'https://thesteadcraft.com/homesteading',
-  },
-  twitter: {
-    title:       'Homesteading Guides | SteadCraft',
-    description:
-      'Complete homesteading guides for every skill level. Grow food, build soil, and live more self-sufficiently.',
+      'Raised beds, vertical growing, and container gardening — grow more food in less space.',
+    url:         'https://thesteadcraft.com/homesteading/suburban/garden',
   },
 };
 
-export default function HomesteadingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function GardenLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
