@@ -176,7 +176,8 @@ function ResourceRenderer({ resource, zone }: { resource: Resource; zone: number
     case 'calendar':  return <CalendarRenderer resource={resource} />
     case 'checklist': return <ChecklistRenderer resource={resource} />
     case 'reference': return <ReferenceRenderer resource={resource} />
-    default:          return <pre className="text-xs">{JSON.stringify(resource.content, null, 2)}</pre>
+    case 'recipe':    return <RecipeRenderer resource={resource} />
+    default:          return <pre className="text-xs overflow-auto p-3 rounded-lg bg-gray-50">{JSON.stringify(resource.content, null, 2)}</pre>
   }
 }
 
@@ -227,7 +228,7 @@ function TableRenderer({ resource, zone }: { resource: Resource; zone: number })
             </thead>
             <tbody>
               {filtered.map((row, ri) => (
-                <tr key={ri} className={ri % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                <tr key={ri} className={ri % 2 === 0 ? bg-background : bg-muted/20}>
                   {row.map((cell, ci) => (
                     <td key={ci} className="px-3 py-2 text-muted-foreground border-b border-border/20 whitespace-nowrap">
                       {cell === "—" ? <span className="text-muted-foreground/40">—</span> : cell}
