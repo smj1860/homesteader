@@ -1,28 +1,26 @@
 import type { Metadata } from 'next';
 
-// This layout exists specifically to inject metadata for /homesteading,
-// which is a 'use client' component and therefore cannot export its own metadata.
-// Child routes (e.g. /homesteading/suburban) that need their own metadata
-// should define it in their own layout.tsx or page.tsx.
+// ⚠️  This file belongs at: src/app/homesteading/beginners/layout.tsx
+//     It REPLACES the file currently there (which has the wrong metadata).
 
 export const metadata: Metadata = {
-  title:       'Homesteading Guides',
+  title:       'Homestead Plan Generator',
   description:
-    'Complete homesteading guides for every skill level — from suburban balcony gardens to off-grid acreage. Grow food, build soil, preserve the harvest, and live more self-sufficiently.',
+    'Answer a few questions and get a personalized homestead plan — zone-specific crop recommendations, soil mix recipes, and chicken coop sizing tailored to your land and family.',
   openGraph: {
-    title:       'Homesteading Guides | SteadCraft',
+    title:       'Homestead Plan Generator | SteadCraft',
     description:
-      'Complete homesteading guides for every skill level. Grow food, build soil, and live more self-sufficiently — wherever you are.',
-    url:         'https://thesteadcraft.com/homesteading',
+      'Get a personalized homestead plan in minutes — crop picks, soil recipes, and coop sizing for your exact zone and acreage.',
+    url:         'https://thesteadcraft.com/homesteading/beginners',
   },
   twitter: {
-    title:       'Homesteading Guides | SteadCraft',
+    title:       'Homestead Plan Generator | SteadCraft',
     description:
-      'Complete homesteading guides for every skill level. Grow food, build soil, and live more self-sufficiently.',
+      'Get a personalized homestead plan in minutes — crop picks, soil recipes, and coop sizing for your exact zone and acreage.',
   },
 };
 
-export default function HomesteadingLayout({
+export default function BeginnersLayout({
   children,
 }: {
   children: React.ReactNode;
