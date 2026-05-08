@@ -128,7 +128,7 @@ export default function SoilResourcePage() {
                       <p className="text-sm leading-relaxed mb-2" style={{ color: `${FOREST}cc` }}>{what}</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                         <div className="rounded-lg px-3 py-1.5" style={{ backgroundColor: `${color}12`, border: `1px solid ${color}25` }}>
-                          <span className="font-bold" style={{ color }}>Rate: </span>
+                          <span className="font-bold" style={{ color:GOLD }}>Rate: </span>
                           <span style={{ color: `${FOREST}99` }}>{rate}</span>
                         </div>
                         <div className="rounded-lg px-3 py-1.5" style={{ backgroundColor: `${FOREST}08`, border: `1px solid ${FOREST}15` }}>
