@@ -234,13 +234,13 @@ export default function PlantingSchedulesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ backgroundColor: FOREST }}>
-                  <th className="text-left px-4 py-3 font-semibold w-36" style={{ color: PARCH }}>Crop</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: PARCH }}>Start Indoors</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: PARCH }}>Transplant Out</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: PARCH }}>Direct Sow</th>
-                  <th className="text-left px-4 py-3 font-semibold" style={{ color: PARCH }}>Days to Maturity</th>
-                  <th className="text-left px-4 py-3 font-semibold hidden lg:table-cell" style={{ color: PARCH }}>Notes</th>
+                <tr style={{ backgroundColor: GOLD }}>
+                  <th className="text-left px-4 py-3 font-semibold w-36" style={{ color: '#1a1a1a' }}>Crop</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: '#1a1a1a' }}>Start Indoors</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: '#1a1a1a' }}>Transplant Out</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: '#1a1a1a' }}>Direct Sow</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: '#1a1a1a' }}>Days to Maturity</th>
+                  <th className="text-left px-4 py-3 font-semibold hidden lg:table-cell" style={{ color: '#1a1a1a' }}>Notes</th>
                 </tr>
               </thead>
               <tbody>
