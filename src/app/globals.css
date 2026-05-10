@@ -8,13 +8,13 @@
 @layer base {
   :root {
     --background: 40 40% 98%;
-    --foreground: 100 48% 12%;
+    --foreground: 124 27% 12%;       /* #264228 hue for text */
     
     /* Primary Action Color - Set to Leather */
     --primary: 20 55% 36%;           /* #8D4E2D Leather */
     --primary-foreground: 0 0% 100%; /* White text for buttons */
     
-    --card: 100 48% 15%;
+    --card: 124 27% 20%;             /* #264228 Forest Green */
     --card-foreground: 40 40% 98%;
     --popover: 40 40% 98%;
     --popover-foreground: 100 48% 12%;
@@ -44,9 +44,9 @@
     --primary: 20 45% 55%;
     --primary-foreground: 0 0% 100%; /* Keep text white for contrast */
     
-    --card: 100 48% 10%;
+    --card: 124 27% 13%;             /* #264228 Forest Green darkened for dark mode */
     --card-foreground: 83 38% 95%;
-    --popover: 100 48% 10%;
+    --popover: 124 27% 13%;
     --popover-foreground: 83 38% 95%;
     --secondary: 100 30% 18%;
     --secondary-foreground: 83 38% 95%;
