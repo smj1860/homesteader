@@ -257,7 +257,7 @@ export default function HomesteadingHub() {
                     Budget Guide
                   </span>
                 </div>
-                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: FOREST }}>
+                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: `${PARCH}99` }}>
                   Homesteading on a Budget
                 </h3>
                 <p className="text-sm mb-5 flex-1" style={{ color: `${FOREST}99` }}>
