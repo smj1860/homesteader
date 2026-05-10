@@ -239,7 +239,7 @@ export default function HomesteadingHub() {
               <div
                 className="rounded-2xl p-7 h-full flex flex-col transition-all duration-200 group-hover:-translate-y-1"
                 style={{
-                  backgroundColor: PARCH2,
+                  backgroundColor: FOREST,
                   border: `1.5px solid ${FOREST}20`,
                 }}
               >
