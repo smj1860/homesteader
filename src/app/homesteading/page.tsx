@@ -234,80 +234,53 @@ export default function HomesteadingHub() {
               </div>
             </Link>
 
-{/* Homesteading on a Budget */}
-<Link href="/homesteading/budget" className="group block">
-  <div
-    className="rounded-2xl p-7 h-full flex flex-col transition-all duration-200 group-hover:shadow-lg"
-    style={{
-      backgroundColor: PARCH2,
-      border: `1.5px solid ${FOREST}20`,
-    }}
-  >
-    {/* Icon */}
-    <div
-      className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-      style={{ backgroundColor: `${GOLD}15` }}
-    >
-      <span style={{ fontSize: 24 }}>💰</span>
-    </div>
-
-    {/* Label */}
-    <p
-      className="text-xs font-bold uppercase tracking-widest mb-2"
-      style={{ color: GOLD }}
-    >
-      Budget Guide
-    </p>
-
-    {/* Title */}
-    <h3
-      className="font-serif text-xl font-bold mb-3 leading-snug"
-      style={{ color: FOREST }}
-    >
-      Homesteading on a Budget
-    </h3>
-
-    {/* Description */}
-    <p
-      className="text-sm leading-relaxed mb-6 flex-1"
-      style={{ color: `${FOREST}99` }}
-    >
-      Tools, homemade supplies, food production, and income generation —
-      homesteading made practical for any budget, any space, any starting point.
-    </p>
-
-    {/* Feature list */}
-    <ul className="space-y-2 mb-6">
-      {[
-        'Personalized land & space growing plan',
-        'Heirloom crops weighted for seed saving',
-        'Homemade cleaners & supplies',
-        'Ways to generate income from your homestead',
-      ].map((item) => (
-        <li
-          key={item}
-          className="flex items-start gap-2.5 text-sm"
-          style={{ color: FOREST }}
-        >
-          <span style={{ color: GOLD, fontWeight: 700, marginTop: 1 }}>✓</span>
-          {item}
-        </li>
-      ))}
-    </ul>
-
-    {/* CTA */}
-    <div
-      className="inline-flex items-center gap-2 text-sm font-bold transition-all"
-      style={{ color: FOREST }}
-    >
-      Explore Guide
-      <ArrowRight
-        className="h-4 w-4 transition-transform group-hover:translate-x-1"
-        style={{ color: GOLD }}
-      />
-    </div>
-  </div>
-</Link>
+            {/* Homesteading on a Budget */}
+            <Link href="/homesteading/budget" className="group block">
+              <div
+                className="rounded-2xl p-7 h-full flex flex-col transition-all duration-200 group-hover:-translate-y-1"
+                style={{
+                  backgroundColor: PARCH2,
+                  border: `1.5px solid ${FOREST}20`,
+                }}
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: `${GOLD}22` }}
+                  >
+                    <span style={{ fontSize: 24 }}>💰</span>
+                  </div>
+                  <span
+                    className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    style={{ backgroundColor: `${GOLD}22`, color: GOLD }}
+                  >
+                    Budget Guide
+                  </span>
+                </div>
+                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: FOREST }}>
+                  Homesteading on a Budget
+                </h3>
+                <p className="text-sm mb-5 flex-1" style={{ color: `${FOREST}99` }}>
+                  Tools, homemade supplies, food production, and income generation —
+                  practical homesteading for any budget, any space, any starting point.
+                </p>
+                <ul className="space-y-1.5 mb-5">
+                  {[
+                    'Personalized land & space growing plan',
+                    'Heirloom crops weighted for seed saving',
+                    'Homemade cleaners & supplies',
+                    'Ways to generate income from your homestead',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: `${FOREST}99` }}>
+                      <span style={{ color: GOLD }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <span className="flex items-center gap-1 text-xs font-semibold" style={{ color: GOLD }}>
+                  Explore guide <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Link>
 
             {/* Building Plans — coming soon */}
             <div
