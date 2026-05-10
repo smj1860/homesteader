@@ -239,7 +239,7 @@ export default function HomesteadingHub() {
               <div
                 className="rounded-2xl p-7 h-full flex flex-col transition-all duration-200 group-hover:-translate-y-1"
                 style={{
-                  backgroundColor: FOREST,
+                  backgroundColor: PARCH2,
                   border: `1.5px solid ${FOREST}20`,
                 }}
               >
@@ -257,10 +257,10 @@ export default function HomesteadingHub() {
                     Budget Guide
                   </span>
                 </div>
-                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: PARCH }}>
+                <h3 className="font-serif text-xl font-bold mb-2" style={{ color: FOREST }}>
                   Homesteading on a Budget
                 </h3>
-                <p className="text-sm mb-5 flex-1" style={{ color: ``${PARCH}99`` }}>
+                <p className="text-sm mb-5 flex-1" style={{ color: `${FOREST}99` }}>
                   Tools, homemade supplies, food production, and income generation —
                   practical homesteading for any budget, any space, any starting point.
                 </p>
