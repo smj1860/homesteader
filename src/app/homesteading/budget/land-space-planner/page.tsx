@@ -1,7 +1,7 @@
 // src/app/homesteading/budget/land-space-planner/page.tsx
 
 import { redirect } from 'next/navigation'
-import { createClient } from '@/supabase/server'
+import { createClient } from '@/supabase/config'
 import { getSavedBudgetPlans } from '@/app/actions/budget-planner'
 import LandSpacePlanner from '@/components/budget/LandSpacePlanner'
 
