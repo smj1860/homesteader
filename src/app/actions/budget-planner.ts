@@ -1,7 +1,7 @@
 // src/app/actions/budget-planner.ts
 'use server'
 
-import { createClient } from '@/supabase/config'
+import { createClient } from '@/supabase/server'
 import { redirect } from 'next/navigation'
 import { getZoneFromZip } from '@/lib/zone-lookup'
 import {
