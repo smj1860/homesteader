@@ -234,12 +234,6 @@ export default function HomesteadingHub() {
               </div>
             </Link>
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DROP THIS TILE INTO: src/app/homesteading/page.tsx
-// Inside the <div className="grid grid-cols-1 md:grid-cols-3 gap-5"> section
-// alongside the existing Suburban Homesteading and Beginners tiles
-// ─────────────────────────────────────────────────────────────────────────────
-
 {/* Homesteading on a Budget */}
 <Link href="/homesteading/budget" className="group block">
   <div
