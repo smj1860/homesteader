@@ -230,21 +230,25 @@ function getRecommendedCrops(zone: string): string[] {
  * Main function: generates complete homestead plan data from questionnaire answers
  */
 export function generateHomesteadPlan(
-  acreage: number,
-  familySize: number,
-  zone: string,
-  state: string,
+  acreage:      number,
+  familySize:   number,
+  zone:         string,
+  state:        string,
   wantsChickens: boolean
 ): HomesteadPlanData {
+  const coop = generateCoopData(familySize, acreage)
+
   return {
     acreage,
     familySize,
     zone,
     state,
     wantsChickens,
-    coopRecommendation: generateCoopRecommendation(familySize, acreage),
-    soilMix: generateSoilMix(),
-    vegetableYields: calculateYieldTargets(acreage, familySize),
-    recommendedCrops: getRecommendedCrops(zone),
+    coopRecommendation: coop.description,   // full text (used in PDF)
+    coopSizeLabel:      coop.sizeLabel,     // short label (used in UI)
+    coopChickenCount:   coop.chickenCount,  // flock count (used in UI)
+    soilMix:            generateSoilMix(),
+    vegetableYields:    calculateYieldTargets(acreage, familySize),
+    recommendedCrops:   getRecommendedCrops(zone),
   }
 }
