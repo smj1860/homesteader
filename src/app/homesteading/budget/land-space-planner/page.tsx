@@ -1,25 +1,41 @@
+'use client'
+
 // src/app/homesteading/budget/land-space-planner/page.tsx
-import { createClient } from '@/supabase/config'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useUser } from '@/supabase'
 import { getSavedBudgetPlans } from '@/app/actions/budget-planner'
 import LandSpacePlanner from '@/components/budget/LandSpacePlanner'
-import Link from 'next/link'
 
 const FOREST = '#264228'
 const GOLD   = '#A88032'
 const PARCH  = '#F7F3EB'
 const PARCH2 = '#EDE8DE'
 
-export const metadata = {
-  title: 'Land & Space Planner — Homesteading on a Budget | SteadCraft',
-  description: 'Get a personalized growing plan based on your available land or indoor space. Free for all SteadCraft members.',
-}
+export default function LandSpacePlannerPage() {
+  const { user, loading: authLoading } = useUser()
+  const [savedPlans, setSavedPlans]   = useState<{ landPlan: unknown; spacePlan: unknown } | null>(null)
+  const [plansLoading, setPlansLoading] = useState(false)
 
-export default async function LandSpacePlannerPage() {
-  const supabase   = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  useEffect(() => {
+    if (!user) return
+    setPlansLoading(true)
+    getSavedBudgetPlans()
+      .then(setSavedPlans)
+      .catch(() => setSavedPlans(null))
+      .finally(() => setPlansLoading(false))
+  }, [user])
 
-  // Load saved plans only if logged in
-  const savedPlans = user ? await getSavedBudgetPlans() : null
+  // Show nothing while auth resolves — avoids flash of the sign-in tile
+  if (authLoading) {
+    return (
+      <main style={{ backgroundColor: PARCH, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: `3px solid ${GOLD}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      </main>
+    )
+  }
 
   return (
     <main style={{ backgroundColor: PARCH, minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
@@ -43,7 +59,7 @@ export default async function LandSpacePlannerPage() {
             Land & Space Planner
           </h1>
           <p className="text-base leading-relaxed" style={{ color: `${FOREST}99` }}>
-            Tell us about your available space and we'll build a personalized growing plan — weighted toward
+            Tell us about your available space and we&apos;ll build a personalized growing plan — weighted toward
             heirloom varieties, high-yield crops, and vertical growing to maximize every square foot.
             Your plan is saved to your account and referenced throughout the rest of this guide.
           </p>
@@ -74,16 +90,13 @@ export default async function LandSpacePlannerPage() {
           </div>
         </div>
 
-        {/* Auth gate — inline, no redirect */}
+        {/* Auth gate — only shows if truly logged out */}
         {!user ? (
           <div
             className="rounded-2xl p-8 text-center"
             style={{ backgroundColor: FOREST, border: `2px solid ${GOLD}` }}
           >
-            <p
-              className="text-xs font-bold uppercase tracking-widest mb-3"
-              style={{ color: GOLD }}
-            >
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
               Free Account Required
             </p>
             <h2 className="text-xl font-bold mb-3" style={{ color: PARCH }}>
@@ -95,20 +108,26 @@ export default async function LandSpacePlannerPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href={`/auth/signup?next=/homesteading/budget/land-space-planner`}
+                href="/signup"
                 className="px-6 py-3 rounded-xl font-bold text-sm transition-all"
                 style={{ backgroundColor: GOLD, color: '#1a1a1a' }}
               >
                 Create Free Account
               </Link>
               <Link
-                href={`/auth/login?next=/homesteading/budget/land-space-planner`}
+                href="/signup?mode=signin"
                 className="px-6 py-3 rounded-xl font-bold text-sm transition-all"
                 style={{ backgroundColor: 'transparent', color: PARCH, border: `1.5px solid ${PARCH}40` }}
               >
                 Sign In
               </Link>
             </div>
+          </div>
+        ) : plansLoading ? (
+          <div className="flex items-center justify-center py-16" style={{ color: `${FOREST}88` }}>
+            <div style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', border: `2px solid ${GOLD}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite', marginRight: '0.75rem' }} />
+            Loading your saved plans…
+            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
           </div>
         ) : (
           <LandSpacePlanner
@@ -122,11 +141,7 @@ export default async function LandSpacePlannerPage() {
           className="mt-12 pt-8 flex items-center justify-between text-sm"
           style={{ borderTop: `1px solid ${FOREST}20` }}
         >
-          <a
-            href="/homesteading/budget"
-            className="flex items-center gap-2 font-medium"
-            style={{ color: FOREST }}
-          >
+          <a href="/homesteading/budget" className="flex items-center gap-2 font-medium" style={{ color: FOREST }}>
             ← Overview
           </a>
           <a
@@ -137,6 +152,7 @@ export default async function LandSpacePlannerPage() {
             Next: Tools →
           </a>
         </div>
+
       </div>
     </main>
   )
