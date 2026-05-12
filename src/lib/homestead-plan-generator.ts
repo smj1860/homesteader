@@ -173,23 +173,46 @@ This formula scales linearly. Multiply each ratio number by the number of beds y
 /**
  * Generates chicken coop recommendation based on family size
  */
-function generateCoopRecommendation(familySize: number, acreage: number): string {
-  const chickenCount = Math.max(2, Math.floor(familySize * 0.75)) // ~1 chicken per 1.5 people for eggs
-  const runSize = chickenCount * 10 // 10 sq ft per chicken in run
+function generateCoopData(
+  familySize: number,
+  acreage: number
+): { sizeLabel: string; chickenCount: number; description: string } {
+  const chickenCount = Math.max(2, Math.floor(familySize * 0.75))
+  const runSize      = chickenCount * 10
 
   if (acreage < 0.25) {
-    return `For your space, we recommend ${chickenCount} bantam chickens (smaller breed) in a portable coop (4'x6' minimum). 
-      Bantams eat less, produce fewer droppings, and fit small yards. A run of at least ${runSize} sq ft allows rotation and foraging. 
-      Mobile coops let you move the run weekly to prevent ground degradation.`
+    return {
+      sizeLabel:    '4×6 Portable Coop',
+      chickenCount,
+      description:
+        `For your space, we recommend ${chickenCount} bantam chickens in a portable 4'×6' coop. ` +
+        `Bantams eat less, produce fewer droppings, and fit small yards well. ` +
+        `A run of at least ${runSize} sq ft lets you rotate and keep the ground from getting torn up. ` +
+        `Mobile coops let you move the run weekly to prevent ground degradation.`,
+    }
   } else if (acreage < 0.5) {
-    return `A flock of ${chickenCount} standard chickens works well on your property. Build a fixed coop (6'x8' minimum) with ${runSize} sq ft of predator-proof run. 
-      This setup provides 3-5 eggs daily, enough for most families. Include 3-4 nesting boxes and roosts for comfort.`
+    return {
+      sizeLabel:    '6×8 Standard Coop',
+      chickenCount,
+      description:
+        `A flock of ${chickenCount} standard-breed chickens works well on your property. ` +
+        `Build a fixed 6'×8' coop with ${runSize} sq ft of predator-proof run. ` +
+        `This setup produces 3–5 eggs daily — enough for most families. ` +
+        `Include 3–4 nesting boxes and roosts at varying heights for comfort.`,
+    }
   } else {
-    return `You have room for ${chickenCount + 2} chickens with space for future expansion. A 8'x10' coop with multiple run areas (${Math.round(runSize * 1.5)} sq ft total) 
-      lets you rotate grazing. Include a dedicated predator-proof nighttime roost and a larger daytime run. You could even consider ducks or geese as companion birds.`
+    return {
+      sizeLabel:    '8×10 Large Coop',
+      chickenCount: chickenCount + 2,
+      description:
+        `You've got room for ${chickenCount + 2} chickens with space for future expansion. ` +
+        `An 8'×10' coop with multiple run areas (${Math.round(runSize * 1.5)} sq ft total) ` +
+        `lets you rotate grazing and keeps the ground healthier. ` +
+        `Include a predator-proof nighttime roost and a larger daytime run. ` +
+        `You could even add ducks or geese as companion birds down the road.`,
+    }
   }
 }
-
 /**
  * Gets recommended crops for a zone, prioritizing calorie-dense varieties
  * Returns top 5 crops by caloric value per pound
