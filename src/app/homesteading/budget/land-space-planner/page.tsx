@@ -1,9 +1,8 @@
 // src/app/homesteading/budget/land-space-planner/page.tsx
-
-import { redirect } from 'next/navigation'
 import { createClient } from '@/supabase/config'
 import { getSavedBudgetPlans } from '@/app/actions/budget-planner'
 import LandSpacePlanner from '@/components/budget/LandSpacePlanner'
+import Link from 'next/link'
 
 const FOREST = '#264228'
 const GOLD   = '#A88032'
@@ -16,13 +15,11 @@ export const metadata = {
 }
 
 export default async function LandSpacePlannerPage() {
-  // Auth gate
-  const supabase = createClient()
+  const supabase   = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login?next=/homesteading/budget/land-space-planner')
 
-  // Load saved plans
-  const { landPlan, spacePlan } = await getSavedBudgetPlans()
+  // Load saved plans only if logged in
+  const savedPlans = user ? await getSavedBudgetPlans() : null
 
   return (
     <main style={{ backgroundColor: PARCH, minHeight: '100vh', fontFamily: 'Georgia, serif' }}>
@@ -77,11 +74,48 @@ export default async function LandSpacePlannerPage() {
           </div>
         </div>
 
-        {/* Planner component */}
-        <LandSpacePlanner
-          savedLandPlan={landPlan}
-          savedSpacePlan={spacePlan}
-        />
+        {/* Auth gate — inline, no redirect */}
+        {!user ? (
+          <div
+            className="rounded-2xl p-8 text-center"
+            style={{ backgroundColor: FOREST, border: `2px solid ${GOLD}` }}
+          >
+            <p
+              className="text-xs font-bold uppercase tracking-widest mb-3"
+              style={{ color: GOLD }}
+            >
+              Free Account Required
+            </p>
+            <h2 className="text-xl font-bold mb-3" style={{ color: PARCH }}>
+              Sign in to build your plan
+            </h2>
+            <p className="text-sm leading-relaxed mb-6" style={{ color: `${PARCH}cc` }}>
+              The Land & Space Planner saves your results to your account so every other section of
+              this guide can reference them. Creating an account is free — no credit card required.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href={`/auth/signup?next=/homesteading/budget/land-space-planner`}
+                className="px-6 py-3 rounded-xl font-bold text-sm transition-all"
+                style={{ backgroundColor: GOLD, color: '#1a1a1a' }}
+              >
+                Create Free Account
+              </Link>
+              <Link
+                href={`/auth/login?next=/homesteading/budget/land-space-planner`}
+                className="px-6 py-3 rounded-xl font-bold text-sm transition-all"
+                style={{ backgroundColor: 'transparent', color: PARCH, border: `1.5px solid ${PARCH}40` }}
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <LandSpacePlanner
+            savedLandPlan={savedPlans?.landPlan ?? null}
+            savedSpacePlan={savedPlans?.spacePlan ?? null}
+          />
+        )}
 
         {/* Bottom nav */}
         <div
