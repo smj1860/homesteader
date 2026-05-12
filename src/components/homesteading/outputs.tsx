@@ -1,448 +1,457 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
-  Loader2, Download, Share2, Eye, ChevronDown, ChevronUp,
-  CheckCircle2, Sprout, Zap, Leaf, AlertCircle
+  Leaf, Zap, ChevronDown, ChevronUp,
+  Download, Save, BookOpen, ShoppingCart, AlertCircle, Lock,
 } from 'lucide-react'
-import { HomesteadPlanData, generateHomesteadPlanHTML, downloadPDFAsPrint } from '@/lib/pdf-generator'
+import { HomesteadPlanData } from '@/lib/pdf-generator'
+import { downloadPDFAsPrint } from '@/lib/pdf-generator'
 import { saveHomesteadPlan } from '@/app/actions/homesteading'
 
-interface HomesteadingOutputsProps {
-  planData: HomesteadPlanData
-  userId?: string
-  onBack?: () => void
+const FOREST = '#264228'
+const GOLD   = '#A88032'
+const PARCH  = '#F7F3EB'
+const PARCH2 = '#EDE8DE'
+
+interface Props {
+  planData:    HomesteadPlanData
+  userId?:     string | null
+  onBack?:     () => void
   onNeedAuth?: () => void
 }
 
-export function HomesteadingOutputs({ planData, userId, onBack, onNeedAuth }: HomesteadingOutputsProps) {
-  const [isSaving, setIsSaving] = useState(false)
-  const [isDownloading, setIsDownloading] = useState(false)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(userId ? ['crops', 'yields', 'soil'] : ['crops'])
-  )
-  const [saveSuccess, setSaveSuccess] = useState(false)
+export function HomesteadingOutputs({ planData, userId, onBack, onNeedAuth }: Props) {
+  const [expanded,  setExpanded]  = useState<Set<string>>(new Set(['crops']))
+  const [saving,    setSaving]    = useState(false)
+  const [saved,     setSaved]     = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const toggleSection = (section: string) => {
-    // If user isn't logged in and trying to access protected sections, show auth prompt
-    if (!userId && (section === 'soil' || section === 'chickens')) {
-      onNeedAuth?.()
-      return
-    }
-
-    const newExpanded = new Set(expandedSections)
-    if (newExpanded.has(section)) {
-      newExpanded.delete(section)
-    } else {
-      newExpanded.add(section)
-    }
-    setExpandedSections(newExpanded)
+  const toggle = (key: string) => {
+    const locked = !userId && (key === 'soil' || key === 'chickens')
+    if (locked) { onNeedAuth?.(); return }
+    setExpanded(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
   }
 
-  const handleDownloadPDF = async () => {
-    if (!userId) {
-      onNeedAuth?.()
-      return
-    }
-    setIsDownloading(true)
-    try {
-      const html = generateHomesteadPlanHTML(planData)
-      downloadPDFAsPrint(html, 'homestead-plan.pdf')
-    } catch (err) {
-      console.error('Error generating PDF:', err)
-    } finally {
-      setIsDownloading(false)
-    }
+  const handleDownload = () => {
+    if (!userId) { onNeedAuth?.(); return }
+    downloadPDFAsPrint(planData)
   }
 
-  const handleSavePlan = async () => {
-    if (!userId) {
-      alert('Please sign in to save your plan')
-      return
-    }
-
-    setIsSaving(true)
+  const handleSave = async () => {
+    if (!userId) { onNeedAuth?.(); return }
+    setSaving(true)
+    setSaveError(null)
     try {
       await saveHomesteadPlan(userId, planData)
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
-    } catch (err) {
-      console.error('Error saving plan:', err)
-      alert('Could not save your plan. Please try again.')
+      setSaved(true)
+    } catch {
+      setSaveError('Could not save plan. Try again.')
     } finally {
-      setIsSaving(false)
+      setSaving(false)
     }
   }
 
+  // ── Shared style helpers ──────────────────────────────────────────────
+  const card = (extra?: React.CSSProperties): React.CSSProperties => ({
+    backgroundColor: '#ffffff',
+    border: `1.5px solid ${FOREST}18`,
+    borderRadius: '0.875rem',
+    overflow: 'hidden',
+    ...extra,
+  })
+
+  const sectionBtn = (locked?: boolean): React.CSSProperties => ({
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '1rem 1.25rem',
+    background: 'none',
+    border: 'none',
+    cursor: locked ? 'pointer' : 'pointer',
+    textAlign: 'left',
+    gap: '0.75rem',
+  })
+
+  const sectionTitle: React.CSSProperties = {
+    fontFamily: 'Georgia, serif',
+    fontSize: '1.0625rem',
+    fontWeight: 700,
+    color: FOREST,
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  }
+
+  const body: React.CSSProperties = {
+    padding: '0 1.25rem 1.25rem',
+  }
+
+  const pillStyle = (color: string): React.CSSProperties => ({
+    display: 'inline-block',
+    padding: '0.25rem 0.625rem',
+    borderRadius: '9999px',
+    fontSize: '0.6875rem',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    backgroundColor: `${color}20`,
+    color,
+    border: `1px solid ${color}50`,
+  })
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Auth Required Message */}
+    <div style={{ width: '100%', maxWidth: '42rem', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+      {/* Summary header */}
+      <div style={{ backgroundColor: FOREST, borderRadius: '0.875rem', padding: '1.5rem' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: GOLD, marginBottom: '0.375rem' }}>
+          Your Personalized Plan
+        </p>
+        <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: PARCH, margin: '0 0 0.5rem' }}>
+          {planData.acreage < 1
+            ? `${(planData.acreage * 43560).toFixed(0)} sq ft Homestead`
+            : `${planData.acreage}-Acre Homestead`}
+        </h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {[
+            `${planData.hardinessZone}`,
+            `${planData.state}`,
+            `Family of ${planData.familySize}`,
+            planData.wantsChickens ? 'Chickens ✓' : null,
+          ].filter(Boolean).map(tag => (
+            <span key={tag!} style={pillStyle(GOLD)}>{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Auth nudge for guests */}
       {!userId && (
-        <Alert className="bg-blue-500/10 border-blue-500/30 text-blue-700">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Create a free account</strong> to unlock your complete homestead plan: printable PDF, scalable soil mix recipe, and coop recommendations.
-            <Button 
+        <div style={{ backgroundColor: `${GOLD}12`, border: `1.5px solid ${GOLD}40`, borderRadius: '0.875rem', padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+          <AlertCircle style={{ width: '1.125rem', height: '1.125rem', color: GOLD, flexShrink: 0, marginTop: '0.125rem' }} />
+          <div>
+            <p style={{ fontWeight: 700, fontSize: '0.875rem', color: FOREST, margin: '0 0 0.25rem' }}>
+              Crops & yields are visible — soil mix, coop guide, and PDF require a free account.
+            </p>
+            <button
               onClick={onNeedAuth}
-              variant="link" 
-              className="text-blue-700 hover:text-blue-800 p-0 ml-2 underline"
+              style={{ fontSize: '0.8125rem', fontWeight: 700, color: GOLD, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              Sign up now
-            </Button>
-          </AlertDescription>
-        </Alert>
+              Sign up free →
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Success Message */}
-      {saveSuccess && (
-        <Alert className="bg-green-500/10 border-green-500/30 text-green-700">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription>
-            Your homestead plan has been saved to your account!
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Header Card */}
-      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-transparent">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <CardTitle className="text-3xl mb-2 text-primary">
-                Your Personalized Homestead Plan
-              </CardTitle>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge variant="outline" className="bg-accent/10">
-                  {planData.acreage} acres
-                </Badge>
-                <Badge variant="outline" className="bg-accent/10">
-                  {planData.zone}
-                </Badge>
-                <Badge variant="outline" className="bg-accent/10">
-                  {planData.state}
-                </Badge>
-                <Badge variant="outline" className="bg-accent/10">
-                  Family of {planData.familySize}
-                </Badge>
-              </div>
-            </div>
+      {/* ── Recommended Crops ─────────────────────────────────────────── */}
+      <div style={card()}>
+        <button style={sectionBtn()} onClick={() => toggle('crops')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+            <Leaf style={{ width: '1.125rem', height: '1.125rem', color: GOLD }} />
+            <span style={sectionTitle}>🌱 Recommended Crops</span>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={handleDownloadPDF}
-              disabled={isDownloading}
-              variant="default"
-              className="bg-accent hover:bg-accent/90 text-black font-semibold"
-            >
-              {isDownloading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" />
-                  Download PDF
-                </>
-              )}
-            </Button>
-            {userId && (
-              <Button
-                onClick={handleSavePlan}
-                disabled={isSaving}
-                variant="outline"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Eye className="mr-2 h-4 w-4" />
-                    Save to Account
-                  </>
-                )}
-              </Button>
-            )}
-            <Button
-              onClick={onBack}
-              variant="ghost"
-            >
-              Start Over
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recommended Crops */}
-      <Card className="border-border/40">
-        <button
-          onClick={() => toggleSection('crops')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-card/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Sprout className="h-5 w-5 text-accent" />
-            <CardTitle>🌱 Best Crops for {planData.zone}</CardTitle>
-          </div>
-          {expandedSections.has('crops') ? (
-            <ChevronUp className="h-5 w-5 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-muted-foreground" />
-          )}
+          {expanded.has('crops')
+            ? <ChevronUp style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />
+            : <ChevronDown style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />}
         </button>
-        {expandedSections.has('crops') && (
-          <CardContent className="pt-0 pb-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              These vegetables thrive in your hardiness zone and are perfect for your climate:
-            </p>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {planData.recommendedCrops.map((crop) => (
-                <li key={crop} className="flex items-center gap-2 p-2 rounded bg-card/50 border border-border/30">
-                  <span className="text-lg">🌾</span>
-                  <span className="font-medium">{crop}</span>
-                </li>
-              ))}
-            </ul>
-            <Alert className="mt-4 bg-blue-500/10 border-blue-500/30">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Start with 2-3 crops your first year. It's easier to expand than overwhelm yourself!
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        )}
-      </Card>
 
-      {/* Vegetable Yields */}
-      <Card className="border-border/40">
-        <button
-          onClick={() => toggleSection('yields')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-card/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Zap className="h-5 w-5 text-accent" />
-            <CardTitle>📊 Realistic Yields for Your Family</CardTitle>
-          </div>
-          {expandedSections.has('yields') ? (
-            <ChevronUp className="h-5 w-5 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-muted-foreground" />
-          )}
-        </button>
-        {expandedSections.has('yields') && (
-          <CardContent className="pt-0 pb-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              With {planData.acreage} acres and a family of {planData.familySize}, expect these annual yields:
+        {expanded.has('crops') && (
+          <div style={body}>
+            <p style={{ fontSize: '0.875rem', color: `${FOREST}99`, marginBottom: '0.875rem' }}>
+              Top picks for {planData.hardinessZone} in {planData.state}, sorted by caloric value per square foot:
             </p>
-            <div className="space-y-3">
-              {planData.vegetableYields.map((yieldItem) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {planData.recommendedCrops.map((crop, i) => (
                 <div
-                  key={yieldItem.name}
-                  className="p-3 rounded border border-border/30 bg-card/50"
+                  key={crop}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.625rem 0.875rem',
+                    backgroundColor: PARCH2,
+                    borderRadius: '0.5rem',
+                    border: `1px solid ${FOREST}12`,
+                  }}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{yieldItem.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{yieldItem.notes}</p>
-                    </div>
-                    <Badge variant="outline" className="shrink-0">
-                      {yieldItem.yield}
-                    </Badge>
-                  </div>
+                  <span style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', backgroundColor: GOLD, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6875rem', fontWeight: 700, flexShrink: 0 }}>
+                    {i + 1}
+                  </span>
+                  <span style={{ fontWeight: 600, fontSize: '0.9375rem', color: FOREST }}>{crop}</span>
                 </div>
               ))}
             </div>
-            <Alert className="mt-4 bg-amber-500/10 border-amber-500/30">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                These are conservative estimates. Your actual yields depend on soil quality, weather, and experience.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        )}
-      </Card>
-
-      {/* Soil Mix */}
-      <Card className={`border-border/40 ${!userId ? 'opacity-60' : ''}`}>
-        <button
-          onClick={() => toggleSection('soil')}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-card/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Leaf className="h-5 w-5 text-accent" />
-            <CardTitle className="flex items-center gap-2">
-              🥗 Elite DIY Soil Mix Recipe
-              {!userId && <Badge variant="outline" className="ml-2 text-xs">Premium</Badge>}
-            </CardTitle>
+            <div style={{ marginTop: '0.875rem', padding: '0.75rem', backgroundColor: `${FOREST}08`, borderRadius: '0.5rem', fontSize: '0.8125rem', color: `${FOREST}99` }}>
+              💡 Start with 2–3 of these your first season. It's easier to expand than to overwhelm yourself.
+            </div>
           </div>
-          {expandedSections.has('soil') ? (
-            <ChevronUp className="h-5 w-5 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-muted-foreground" />
-          )}
-        </button>
-        {!userId && !expandedSections.has('soil') && (
-          <CardContent className="pt-0 pb-4 text-sm text-muted-foreground italic">
-            Sign in to unlock your customized soil mix recipe
-          </CardContent>
         )}
-        {expandedSections.has('soil') && (
-          <CardContent className="pt-0 pb-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              {planData.soilMix.description}
-            </p>
+      </div>
 
-            <div className="mb-4">
-              <h4 className="font-semibold text-sm mb-3">Scalable Ingredient Ratios:</h4>
-              <div className="space-y-2">
-                {planData.soilMix.ingredients.map((ingredient) => (
-                  <div
-                    key={ingredient.name}
-                    className="flex items-center justify-between p-2 rounded bg-card/50 border border-border/30"
-                  >
-                    <span className="text-sm font-medium">{ingredient.name}</span>
-                    <Badge variant="secondary">{ingredient.ratio}</Badge>
+      {/* ── Vegetable Yields ──────────────────────────────────────────── */}
+      <div style={card()}>
+        <button style={sectionBtn()} onClick={() => toggle('yields')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+            <Zap style={{ width: '1.125rem', height: '1.125rem', color: GOLD }} />
+            <span style={sectionTitle}>📊 Realistic Yields for Your Family</span>
+          </div>
+          {expanded.has('yields')
+            ? <ChevronUp style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />
+            : <ChevronDown style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />}
+        </button>
+
+        {expanded.has('yields') && (
+          <div style={body}>
+            <p style={{ fontSize: '0.875rem', color: `${FOREST}99`, marginBottom: '0.875rem' }}>
+              With {planData.acreage} acres and a family of {planData.familySize}, expect these annual yields:
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {planData.vegetableYields.map(item => (
+                <div
+                  key={item.name}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    padding: '0.75rem',
+                    backgroundColor: PARCH2,
+                    borderRadius: '0.5rem',
+                    border: `1px solid ${FOREST}12`,
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.875rem', color: FOREST, margin: '0 0 0.25rem' }}>{item.name}</p>
+                    <p style={{ fontSize: '0.75rem', color: `${FOREST}88`, margin: 0 }}>{item.notes}</p>
+                  </div>
+                  <span style={{ ...pillStyle(FOREST), whiteSpace: 'nowrap' }}>{item.yield}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '0.875rem', padding: '0.75rem', backgroundColor: `${GOLD}10`, borderRadius: '0.5rem', border: `1px solid ${GOLD}30`, fontSize: '0.8125rem', color: `${FOREST}bb` }}>
+              <AlertCircle style={{ display: 'inline', width: '0.875rem', height: '0.875rem', marginRight: '0.375rem', verticalAlign: 'middle' }} />
+              These are conservative estimates. Your actual yields depend on soil quality, weather, and experience.
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Soil Mix ──────────────────────────────────────────────────── */}
+      <div style={card(!userId ? { opacity: 0.7 } : {})}>
+        <button style={sectionBtn()} onClick={() => toggle('soil')}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+            <Leaf style={{ width: '1.125rem', height: '1.125rem', color: GOLD }} />
+            <span style={sectionTitle}>
+              🥗 Elite DIY Soil Mix Recipe
+              {!userId && (
+                <span style={pillStyle(GOLD)}>
+                  <Lock style={{ display: 'inline', width: '0.625rem', height: '0.625rem', marginRight: '0.25rem', verticalAlign: 'middle' }} />
+                  Premium
+                </span>
+              )}
+            </span>
+          </div>
+          {expanded.has('soil')
+            ? <ChevronUp style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />
+            : <ChevronDown style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />}
+        </button>
+
+        {!userId && (
+          <div style={{ padding: '0 1.25rem 1rem', fontSize: '0.875rem', color: `${FOREST}88`, fontStyle: 'italic' }}>
+            Sign in to unlock your customized soil mix recipe
+          </div>
+        )}
+
+        {expanded.has('soil') && userId && (
+          <div style={body}>
+            <p style={{ fontSize: '0.875rem', color: `${FOREST}99`, marginBottom: '0.875rem' }}>{planData.soilMix.description}</p>
+            <h4 style={{ fontWeight: 700, fontSize: '0.875rem', color: FOREST, marginBottom: '0.625rem' }}>Scalable Ingredient Ratios:</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', marginBottom: '0.875rem' }}>
+              {planData.soilMix.ingredients.map(ing => (
+                <div
+                  key={ing.name}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.75rem', backgroundColor: PARCH2, borderRadius: '0.5rem', border: `1px solid ${FOREST}12` }}
+                >
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, color: FOREST }}>{ing.name}</span>
+                  <span style={pillStyle(FOREST)}>{ing.ratio}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: '0.75rem', backgroundColor: `${FOREST}08`, borderRadius: '0.5rem', fontSize: '0.8125rem', color: `${FOREST}99` }}>
+              <strong>Pro Tip:</strong> These ratios scale linearly. For 8 raised beds, multiply each by 8 and order in bulk — you'll save money.
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── Chickens ──────────────────────────────────────────────────── */}
+      {planData.wantsChickens && (
+        <div style={card(!userId ? { opacity: 0.7 } : {})}>
+          <button style={sectionBtn()} onClick={() => toggle('chickens')}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+              <span style={{ fontSize: '1.125rem' }}>🐔</span>
+              <span style={sectionTitle}>
+                Coop Recommendations
+                {!userId && (
+                  <span style={pillStyle(GOLD)}>
+                    <Lock style={{ display: 'inline', width: '0.625rem', height: '0.625rem', marginRight: '0.25rem', verticalAlign: 'middle' }} />
+                    Premium
+                  </span>
+                )}
+              </span>
+            </div>
+            {expanded.has('chickens')
+              ? <ChevronUp style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />
+              : <ChevronDown style={{ width: '1.125rem', height: '1.125rem', color: `${FOREST}60`, flexShrink: 0 }} />}
+          </button>
+
+          {!userId && (
+            <div style={{ padding: '0 1.25rem 1rem', fontSize: '0.875rem', color: `${FOREST}88`, fontStyle: 'italic' }}>
+              Sign in to unlock your customized coop recommendations
+            </div>
+          )}
+
+          {expanded.has('chickens') && userId && (
+            <div style={body}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                {[
+                  { label: 'Coop Size', value: planData.coopSize },
+                  { label: 'Family of', value: `${planData.familySize} people` },
+                ].map(row => (
+                  <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0.75rem', backgroundColor: PARCH2, borderRadius: '0.5rem' }}>
+                    <span style={{ fontSize: '0.875rem', color: `${FOREST}88` }}>{row.label}</span>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: FOREST }}>{row.value}</span>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <Alert className="bg-green-500/10 border-green-500/30">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>Pro Tip:</strong> These ratios scale linearly. For 8 raised beds, multiply each ratio by 8 and order in bulk—you'll save money!
-              </AlertDescription>
-            </Alert>
-
-            <div className="mt-4 p-3 rounded bg-accent/5 border border-accent/20">
-              <p className="text-xs text-muted-foreground">
-                💡 <strong>Next step:</strong> Order these components in bulk from local garden suppliers or online retailers. Check our tool resources for recommended suppliers.
+              <p style={{ fontSize: '0.875rem', color: `${FOREST}99`, marginBottom: '0.875rem' }}>
+                Explore our step-by-step guides and curated suppliers:
               </p>
-            </div>
-          </CardContent>
-        )}
-      </Card>
-
-      {/* Chicken Section (if applicable) */}
-      {planData.wantsChickens && (
-        <Card className={`border-border/40 border-amber-500/30 bg-amber-500/5 ${!userId ? 'opacity-60' : ''}`}>
-          <button
-            onClick={() => toggleSection('chickens')}
-            className="w-full px-6 py-4 flex items-center justify-between hover:bg-amber-500/10 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🐓</span>
-              <CardTitle className="flex items-center gap-2">
-                Chicken Coop & Flock Recommendation
-                {!userId && <Badge variant="outline" className="ml-2 text-xs">Premium</Badge>}
-              </CardTitle>
-            </div>
-            {expandedSections.has('chickens') ? (
-              <ChevronUp className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-muted-foreground" />
-            )}
-          </button>
-          {!userId && !expandedSections.has('chickens') && (
-            <CardContent className="pt-0 pb-4 text-sm text-muted-foreground italic">
-              Sign in to unlock your customized coop recommendations
-            </CardContent>
-          )}
-          {expandedSections.has('chickens') && (
-            <CardContent className="pt-0 pb-6">
-              <div className="p-4 rounded-lg bg-card border border-border/30 mb-4">
-                <p className="text-sm leading-relaxed">{planData.coopRecommendation}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {[
+                  { icon: <BookOpen style={{ width: '1rem', height: '1rem' }} />, label: 'Chicken Coop Builder Guide' },
+                  { icon: <ShoppingCart style={{ width: '1rem', height: '1rem' }} />, label: 'Browse Coop Kits & Supplies' },
+                ].map(btn => (
+                  <button
+                    key={btn.label}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      width: '100%',
+                      padding: '0.625rem 0.875rem',
+                      borderRadius: '0.5rem',
+                      border: `1.5px solid ${FOREST}25`,
+                      backgroundColor: 'transparent',
+                      color: FOREST,
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {btn.icon} {btn.label}
+                  </button>
+                ))}
               </div>
-
-              <p className="text-sm text-muted-foreground mb-3">
-                Ready to build? Explore our step-by-step guides and curated suppliers:
-              </p>
-
-              <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Chicken Coop Builder Guide
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Browse Coop Kits & Supplies
-                </Button>
-              </div>
-            </CardContent>
+            </div>
           )}
-        </Card>
+        </div>
       )}
 
-      {/* Next Steps */}
-      <Card className="border-border/40 bg-gradient-to-r from-primary/5 to-transparent">
-        <CardHeader>
-          <CardTitle>📋 Your Next Steps</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="space-y-3">
-            <li className="flex gap-3">
-              <span className="font-bold text-accent shrink-0">1</span>
+      {/* ── Next Steps ────────────────────────────────────────────────── */}
+      <div style={{ backgroundColor: `${FOREST}08`, border: `1.5px solid ${FOREST}15`, borderRadius: '0.875rem', padding: '1.25rem' }}>
+        <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.0625rem', color: FOREST, margin: '0 0 0.875rem' }}>
+          📋 Your Next Steps
+        </h3>
+        <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+          {[
+            { label: 'Prepare your soil', sub: 'Order components for your soil mix before planting season' },
+            { label: 'Plan your garden layout', sub: 'Map out where each crop will go based on sunlight & water' },
+            { label: 'Start a garden journal', sub: 'Track dates, yields, and lessons learned each season' },
+            ...(planData.wantsChickens ? [{ label: 'Plan your coop', sub: 'Finalize dimensions and construction timeline' }] : []),
+          ].map((step, i) => (
+            <li key={step.label} style={{ display: 'flex', gap: '0.75rem' }}>
+              <span style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', backgroundColor: GOLD, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6875rem', fontWeight: 700, flexShrink: 0, marginTop: '0.125rem' }}>
+                {i + 1}
+              </span>
               <div>
-                <p className="font-medium text-sm">Prepare your soil</p>
-                <p className="text-xs text-muted-foreground">Order components for your soil mix before planting season</p>
+                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: FOREST, margin: '0 0 0.125rem' }}>{step.label}</p>
+                <p style={{ fontSize: '0.75rem', color: `${FOREST}88`, margin: 0 }}>{step.sub}</p>
               </div>
             </li>
-            <li className="flex gap-3">
-              <span className="font-bold text-accent shrink-0">2</span>
-              <div>
-                <p className="font-medium text-sm">Plan your garden layout</p>
-                <p className="text-xs text-muted-foreground">Map out where each crop will go based on sunlight & water</p>
-              </div>
-            </li>
-            <li className="flex gap-3">
-              <span className="font-bold text-accent shrink-0">3</span>
-              <div>
-                <p className="font-medium text-sm">Start a garden journal</p>
-                <p className="text-xs text-muted-foreground">Track dates, yields, and lessons learned each season</p>
-              </div>
-            </li>
-            {planData.wantsChickens && (
-              <li className="flex gap-3">
-                <span className="font-bold text-accent shrink-0">4</span>
-                <div>
-                  <p className="font-medium text-sm">Plan your coop</p>
-                  <p className="text-xs text-muted-foreground">Finalize dimensions and construction timeline</p>
-                </div>
-              </li>
-            )}
-            <li className="flex gap-3">
-              <span className="font-bold text-accent shrink-0">{planData.wantsChickens ? '5' : '4'}</span>
-              <div>
-                <p className="font-medium text-sm">Join the SteadCraft community</p>
-                <p className="text-xs text-muted-foreground">Share progress & learn from other homesteaders</p>
-              </div>
-            </li>
-          </ol>
-        </CardContent>
-      </Card>
+          ))}
+        </ol>
+      </div>
 
-      {/* CTA */}
-      <Card className="border-border/40">
-        <CardContent className="pt-6">
-          <div className="text-center space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Ready to dive deeper? Explore our complete guides and tools.
-            </p>
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-black font-semibold w-full md:w-auto">
-              Explore Suburban Homesteading Guides
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* ── Action buttons ────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={handleDownload}
+          style={{
+            flex: 1,
+            minWidth: '8rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            padding: '0.75rem',
+            borderRadius: '0.625rem',
+            border: `1.5px solid ${FOREST}30`,
+            backgroundColor: 'transparent',
+            color: FOREST,
+            fontWeight: 700,
+            fontSize: '0.9375rem',
+            cursor: 'pointer',
+          }}
+        >
+          <Download style={{ width: '1rem', height: '1rem' }} />
+          {userId ? 'Download PDF' : '🔒 Download PDF'}
+        </button>
+
+        <button
+          onClick={handleSave}
+          disabled={saving || saved || !userId}
+          style={{
+            flex: 1,
+            minWidth: '8rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            padding: '0.75rem',
+            borderRadius: '0.625rem',
+            border: 'none',
+            backgroundColor: saved ? `${FOREST}60` : FOREST,
+            color: PARCH,
+            fontWeight: 700,
+            fontSize: '0.9375rem',
+            cursor: saving || !userId ? 'not-allowed' : 'pointer',
+            opacity: !userId ? 0.6 : 1,
+          }}
+        >
+          <Save style={{ width: '1rem', height: '1rem' }} />
+          {saved ? 'Saved ✓' : saving ? 'Saving…' : userId ? 'Save to Account' : '🔒 Save to Account'}
+        </button>
+      </div>
+
+      {saveError && (
+        <p style={{ fontSize: '0.8125rem', color: '#c0392b', textAlign: 'center' }}>{saveError}</p>
+      )}
+
+      {onBack && (
+        <button
+          onClick={onBack}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: `${FOREST}88`, fontSize: '0.875rem', fontWeight: 600, padding: '0.25rem 0' }}
+        >
+          ← Start Over
+        </button>
+      )}
     </div>
   )
 }
-
-import { BookOpen, ShoppingCart } from 'lucide-react'
