@@ -173,46 +173,63 @@ This formula scales linearly. Multiply each ratio number by the number of beds y
 /**
  * Generates chicken coop recommendation based on family size
  */
+// src/lib/homestead-plan-generator.ts
+// REPLACE the generateCoopData function (and remove old generateCoopRecommendation if still present)
+// with this version. generateHomesteadPlan stays the same as the previous patch.
+
+// ─── Standard sizing constants ────────────────────────────────────────────────
+// 4 sq ft per bird inside the coop (minimum comfortable standard)
+// 10 sq ft per bird in the outdoor run
+
+const SQ_FT_PER_BIRD_INSIDE = 4
+const SQ_FT_PER_BIRD_RUN    = 10
+
+/**
+ * Returns the standard coop label and its interior sq ft for a given chicken count.
+ * Each size is chosen so interior sq ft >= chickenCount * 4.
+ */
+function coopSizeForCount(chickenCount: number): { label: string; sqFt: number } {
+  if (chickenCount <= 4)  return { label: '4×6 Coop',   sqFt: 24  }
+  if (chickenCount <= 6)  return { label: '6×6 Coop',   sqFt: 36  }
+  if (chickenCount <= 8)  return { label: '6×8 Coop',   sqFt: 48  }
+  if (chickenCount <= 10) return { label: '8×8 Coop',   sqFt: 64  }
+  if (chickenCount <= 12) return { label: '8×10 Coop',  sqFt: 80  }
+  return                         { label: '10×12 Coop', sqFt: 120 }
+}
+
+/**
+ * Generates structured coop data from family size.
+ * Chicken count = familySize * 2 (minimum recommendation).
+ * Coop size is derived from chicken count using 4 sq ft/bird interior standard.
+ */
 function generateCoopData(
   familySize: number,
   acreage: number
 ): { sizeLabel: string; chickenCount: number; description: string } {
-  const chickenCount = Math.max(2, Math.floor(familySize * 0.75))
-  const runSize      = chickenCount * 10
+  const chickenCount = familySize * 2
+  const runSize      = chickenCount * SQ_FT_PER_BIRD_RUN
+  const { label: sizeLabel, sqFt } = coopSizeForCount(chickenCount)
 
-  if (acreage < 0.25) {
-    return {
-      sizeLabel:    '4×6 Portable Coop',
-      chickenCount,
-      description:
-        `For your space, we recommend ${chickenCount} bantam chickens in a portable 4'×6' coop. ` +
-        `Bantams eat less, produce fewer droppings, and fit small yards well. ` +
-        `A run of at least ${runSize} sq ft lets you rotate and keep the ground from getting torn up. ` +
-        `Mobile coops let you move the run weekly to prevent ground degradation.`,
-    }
-  } else if (acreage < 0.5) {
-    return {
-      sizeLabel:    '6×8 Standard Coop',
-      chickenCount,
-      description:
-        `A flock of ${chickenCount} standard-breed chickens works well on your property. ` +
-        `Build a fixed 6'×8' coop with ${runSize} sq ft of predator-proof run. ` +
-        `This setup produces 3–5 eggs daily — enough for most families. ` +
-        `Include 3–4 nesting boxes and roosts at varying heights for comfort.`,
-    }
-  } else {
-    return {
-      sizeLabel:    '8×10 Large Coop',
-      chickenCount: chickenCount + 2,
-      description:
-        `You've got room for ${chickenCount + 2} chickens with space for future expansion. ` +
-        `An 8'×10' coop with multiple run areas (${Math.round(runSize * 1.5)} sq ft total) ` +
-        `lets you rotate grazing and keeps the ground healthier. ` +
-        `Include a predator-proof nighttime roost and a larger daytime run. ` +
-        `You could even add ducks or geese as companion birds down the road.`,
-    }
-  }
+  const spaceNote = acreage < 0.25
+    ? `On a smaller lot, a portable or modular coop design lets you rotate the run weekly to keep the ground from getting torn up.`
+    : acreage < 0.5
+    ? `A fixed coop with a dedicated predator-proof run works well for your lot size. Leave room to expand the run as your flock grows.`
+    : `You've got enough room to build a fixed structure with multiple run sections, which lets you rotate grazing and keep the ground healthier year-round.`
+
+  const description =
+    `For a family of ${familySize}, we recommend at least ${chickenCount} chickens — ` +
+    `roughly 2 birds per person to cover daily egg needs with a comfortable surplus. ` +
+    `At 4 sq ft per bird inside, that puts your minimum coop interior at ${chickenCount * SQ_FT_PER_BIRD_INSIDE} sq ft. ` +
+    `A ${sizeLabel} (${sqFt} sq ft interior) meets that comfortably and gives your birds room to move. ` +
+    `Plan your outdoor run at a minimum of ${runSize} sq ft — ${SQ_FT_PER_BIRD_RUN} sq ft per bird. ` +
+    spaceNote
+
+  return { sizeLabel, chickenCount, description }
 }
+
+// ─── generateHomesteadPlan stays the same as the previous patch ───────────────
+// (no changes needed there — it already calls generateCoopData and maps the fields correctly)
+
 /**
  * Gets recommended crops for a zone, prioritizing calorie-dense varieties
  * Returns top 5 crops by caloric value per pound
