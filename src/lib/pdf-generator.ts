@@ -10,6 +10,8 @@ export interface HomesteadPlanData {
   state: string
   wantsChickens: boolean
   coopRecommendation: string
+  coopSizeLabel:    string
+  coopChickenCount: number
   soilMix: SoilMixRecipe
   vegetableYields: VegetableYield[]
   recommendedCrops: string[]
