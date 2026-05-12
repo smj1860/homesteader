@@ -57,7 +57,7 @@ export function HomesteadingOutputs({ planData, userId, onBack, onNeedAuth }: Pr
 
   // ── Build the coop guide URL so the project generator is pre-filled ──
   const coopGuideUrl = planData.wantsChickens
-    ? `/projects/new?title=${encodeURIComponent(`Build a ${planData.coopSizeLabel}`)}&category=livestock&chickens=${planData.coopChickenCount}`
+    ? `/projects?generate=chicken-coop&coopSize=${encodeURIComponent(planData.coopSizeLabel)}&chickens=${planData.coopChickenCount}`
     : '#'
 
   // ── Shared style helpers ──────────────────────────────────────────────
