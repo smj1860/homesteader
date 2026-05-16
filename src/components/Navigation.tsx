@@ -92,33 +92,31 @@ export function Navigation() {
           </div>
 
           {/* Auth buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-            {user ? (
-              <Link href="/account">
-                <Button
-                  variant="outline"
-                  className="border-border/50 hover:bg-primary/5"
-                  style={{ color: FOREST }}
-                >
-                  Account
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signup?mode=signin">
-                  <Button variant="ghost" style={{ color: FOREST }}>Sign In</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button
-                    className="font-bold"
-                    style={{ backgroundColor: FOREST, color: '#F7F3EB' }}
-                  >
-                    Join Now
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
+<div className="flex items-center gap-2 shrink-0">
+  {user ? (
+    <Button
+      variant="outline"
+      className="border-border/50 hover:bg-primary/5"
+      style={{ color: FOREST }}
+      asChild
+    >
+      <Link href="/account">Account</Link>
+    </Button>
+  ) : (
+    <>
+      <Button variant="ghost" style={{ color: FOREST }} asChild>
+        <Link href="/signup?mode=signin">Sign In</Link>
+      </Button>
+      <Button
+        className="font-bold"
+        style={{ backgroundColor: FOREST, color: '#F7F3EB' }}
+        asChild
+      >
+        <Link href="/signup">Join Now</Link>
+      </Button>
+    </>
+  )}
+</div>
         </div>
       </nav>
 
